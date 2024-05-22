@@ -1,0 +1,3921 @@
+//1.Infix to Postfix
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+
+char stack[MAX];
+char infix[MAX], postfix[MAX];
+int top = -1;
+
+void push(char c)
+{
+    if (top == MAX-1)
+    {
+        printf("Stack Overflow");
+        return;
+    }
+    top++;
+    stack[top] = c;
+}
+
+char pop()
+{
+    if (top == -1)
+    {
+        printf("stack underflow");
+        exit(1);
+    }
+
+    char c = stack[top];
+    top--;
+    return c;
+
+}
+
+int isEmpty()
+{
+    if (top == -1)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int precedence(char symbol)
+{
+    switch(symbol)
+    {
+    case '^':
+        return 3;
+    case '/':
+    case '*':
+        return 2;
+    case '+':
+    case '-':
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+
+
+void post()
+{
+    int i, j = 0;
+    char symbol, next;
+
+    for (i = 0; i < strlen(infix); i++)
+    {
+        symbol = infix[i];
+
+        switch(symbol)
+        {
+        case '(':
+            push(symbol);
+            break;
+        case ')':
+            while((next = pop()) != '(')
+            {
+                postfix[j++] = next;
+            }
+            break;
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '^':
+            while (!isEmpty() && precedence(stack[top]) >= precedence(symbol))
+            {
+                postfix[j++] = pop();
+            }
+            push(symbol);
+            break;
+        default:
+            postfix[j++] = symbol;
+            break;
+        }
+    }
+    while(!isEmpty())
+    {
+        postfix[j++] = pop();
+    }
+    postfix[j] = '\0';
+}
+
+void print()
+{
+    int i = 0;
+    printf("\nThe Postfix expression is: \n");
+    while(postfix[i])
+    {
+        printf("%c\n  ",postfix[i++]);
+    }
+    printf("\n");
+}
+
+void posteval()
+{
+    int i = 0, o1, o2;
+    char symbol;
+
+    for (i = 0; i < strlen(postfix); i++)
+    {
+        symbol = postfix[i];
+
+        switch(symbol)
+        {
+        case '+':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o2 + o1)+'0');
+            break;
+        case '-':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o2 - o1)+'0');
+            break;
+        case '*':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o2 * o1)+'0');
+            break;
+        case '/':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o2 / o1)+'0');
+            break;
+        case '^':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o2 ^ o1)+'0');
+            break;
+        default:
+            push(symbol);
+            break;
+        }
+    }
+
+    printf("The result is: %c", stack[top]);
+}
+
+int main()
+{
+    printf("Enter Infix Expression: ");
+    gets(infix);
+
+    post();
+
+    print();
+
+    //int x = (int)postfix[0];
+    //printf("%d", x);
+    posteval();
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+//2.Infix to Prefix
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+//reverse, convert to postfix, reverse again
+#define MAX 100
+
+char infix[MAX], stack[MAX], postfix[MAX], prefix[MAX];
+int top = -1;
+char rev[MAX];
+
+void push(char c)
+{
+    if (top == MAX-1)
+    {
+        printf("Stack Overflow");
+        return;
+    }
+    top++;
+    stack[top] = c;
+}
+
+char pop()
+{
+    if (top == -1)
+    {
+        printf("stack underflow");
+        exit(1);
+    }
+
+    char c = stack[top];
+    top--;
+    return c;
+
+}
+
+int isEmpty()
+{
+    if (top == -1)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int precedence(char symbol)
+{
+    switch(symbol)
+    {
+    case '^':
+        return 3;
+    case '/':
+    case '*':
+        return 2;
+    case '+':
+    case '-':
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+void reverseStr(char a[MAX], char b[MAX])
+{
+    int n = strlen(a);
+    int i = 0, j = 0;
+
+    while (a[i] != '\0')
+    {
+        b[n-1-j] = a[i];
+        i++;
+        j++;
+    }
+
+    b[n] = '\0';
+
+    for (int i = 0; i < strlen(b); i++)
+    {
+        if(b[i] == '(')
+        {
+            b[i] = ')';
+        }
+        else if (b[i] == ')')
+        {
+            b[i] = '(';
+        }
+    }
+}
+
+void pref()
+{
+    int i, j = 0;
+    char symbol, next;
+
+    for (i = 0; i < strlen(rev); i++)
+    {
+        symbol = rev[i];
+
+        switch(symbol)
+        {
+        case '(':
+            push(symbol);
+            break;
+        case ')':
+            while((next = pop()) != '(')
+            {
+                postfix[j++] = next;
+            }
+            break;
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '^':
+            while (!isEmpty() && precedence(stack[top]) >= precedence(symbol))
+            {
+                postfix[j++] = pop();
+            }
+            push(symbol);
+            break;
+        default:
+            postfix[j++] = symbol;
+            break;
+        }
+    }
+    while(!isEmpty())
+    {
+        postfix[j++] = pop();
+    }
+    postfix[j] = '\0';
+}
+
+void preEval()
+{
+    int i = 0, o1, o2;
+    char symbol;
+
+    for (i = strlen(prefix)-1; i >= 0; i--)
+    {
+        symbol = prefix[i];
+
+        switch(symbol)
+        {
+        case '+':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o1 + o2)+'0');
+            break;
+        case '-':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o1 - o2)+'0');
+            break;
+        case '*':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o1 * o2)+'0');
+            break;
+        case '/':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o1 / o2)+'0');
+            break;
+        case '^':
+            o1 = pop() - '0';
+            o2 = pop() - '0';
+            push((o1 ^ o2)+'0');
+            break;
+        default:
+            push(symbol);
+            break;
+        }
+    }
+
+    printf("\nThe result is: %c", stack[top]);
+}
+
+
+void main()
+{
+    printf("Enter Infix Expression: ");
+    gets(infix);
+
+    reverseStr(infix, rev);
+
+    pref();
+
+    reverseStr(postfix, prefix);
+
+    printf("\n");
+
+    printf("Equivalent Prefix Expression is: ");
+    for (int i = 0; i < strlen(prefix); i++)
+    {
+        printf("%c", prefix[i]);
+    }
+
+    preEval();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//3.Two Stack Operation
+
+#include <stdio.h>  
+#define SIZE 20  
+ int array[SIZE];  // declaration of array type variable.  
+int top1 = -1;  
+int top2 = SIZE;  
+   
+//Function to push data into stack1  
+void push1 (int data)  
+{  
+// checking the overflow condition  
+  if (top1 < top2 - 1)  
+  {  
+      top1++;  
+    array[top1] = data;  
+  }  
+  else  
+  {  
+    printf ("Stack is full");  
+  }  
+}  
+// Function to push data into stack2  
+void push2 (int data)  
+{  
+// checking overflow condition    
+if (top1 < top2 - 1)  
+  {  
+    top2--;  
+    array[top2] = data;   
+  }  
+  else  
+  {  
+    printf ("Stack is full..\n");  
+  }  
+}  
+   
+//Function to pop data from the Stack1  
+void pop1 ()  
+{  
+// Checking the underflow condition   
+ if (top1 >= 0)  
+  {  
+    int popped_element = array[top1];  
+    top1--;  
+     
+    printf ("%d is being popped from Stack 1\n", popped_element);  
+  }  
+  else  
+  {  
+    printf ("Stack is Empty \n");  
+  }  
+}  
+// Function to remove the element from the Stack2  
+void pop2 ()  
+{  
+// Checking underflow condition    
+if (top2 < SIZE)  
+  {  
+      int popped_element = array[top2];  
+    top2--;  
+     
+    printf ("%d is being popped from Stack 1\n", popped_element);  
+  }  
+  else  
+  {  
+    printf ("Stack is Empty!\n");  
+  }  
+}  
+   
+//Functions to Print the values of Stack1  
+void display_stack1 ()  
+{  
+  int i;  
+  for (i = top1; i >= 0; --i)  
+  {  
+    printf ("%d ", array[i]);  
+  }  
+  printf ("\n");  
+}  
+// Function to print the values of Stack2  
+void display_stack2 ()  
+{  
+  int i;  
+  for (i = top2; i < SIZE; ++i)  
+  {  
+    printf ("%d ", array[i]);  
+  }  
+  printf ("\n");  
+}  
+   
+int main()  
+{  
+  int ar[SIZE];  
+  int i;  
+  int num_of_ele;  
+   
+  printf ("We can push a total of 20 values\n");  
+   
+  //Number of elements pushed in stack 1 is 10  
+  //Number of elements pushed in stack 2 is 10  
+   
+// loop to insert the elements into Stack1    
+for (i = 1; i <= 10; ++i)  
+  {  
+    push1(i);  
+    printf ("Value Pushed in Stack 1 is %d\n", i);  
+  }  
+// loop to insert the elements into Stack2.    
+for (i = 11; i <= 20; ++i)  
+  {  
+    push2(i);  
+    printf ("Value Pushed in Stack 2 is %d\n", i);  
+  }  
+   
+  //Print Both Stacks  
+  display_stack1 ();  
+ display_stack2 ();  
+   
+  //Pushing on Stack Full  
+  printf ("Pushing Value in Stack 1 is %d\n", 11);  
+  push1 (11);  
+   
+  //Popping All Elements from Stack 1  
+  num_of_ele = top1 + 1;  
+  while (num_of_ele)  
+  {  
+    pop1 ();  
+    --num_of_ele;  
+  }  
+   
+  // Trying to Pop the element From the Empty Stack  
+  pop1 ();  
+   
+  return 0;  
+}  
+
+
+
+
+
+
+
+
+
+
+
+
+
+//4.Factorial&Fibonacchi Stack
+
+
+// // //FactorialUsingStack
+
+// #include <stdio.h>
+// #include <stdlib.h>
+
+// #define MAX_SIZE 100
+
+// int stack[MAX_SIZE];
+// int top = -1;
+
+// int isFull() {
+//     return top == MAX_SIZE - 1;
+// }
+
+// int isEmpty() {
+//     return top == -1;
+// }
+
+// void push(int value) {
+//     if (!isFull()) {
+//         stack[++top] = value;
+//     } else {
+//         printf("Stack Overflow\n");
+//         exit(EXIT_FAILURE);
+//     }
+// }
+
+// int pop() {
+//     if (!isEmpty()) {
+//         return stack[top--];
+//     } else {
+//         printf("Stack Underflow\n");
+//         exit(EXIT_FAILURE);
+//     }
+// }
+
+// int factorial(int n) {
+//     push(n);
+
+//     int result = 1;
+
+//     while (!isEmpty()) {
+//         int topValue = pop();
+//         result *= topValue;
+
+//         if (topValue > 1) {
+//             push(topValue - 1);
+//         }
+//     }
+
+//     return result;
+// }
+
+// int main() {
+//     int num;
+
+//     printf("Enter a number to calculate its factorial: ");
+//     scanf("%d", &num);
+
+//     if (num < 0) {
+//         printf("Factorial is not defined for negative numbers.\n");
+//     } else {
+//         int result = factorial(num);
+//         printf("Factorial of %d is: %d\n", num, result);
+//     }
+
+//     return 0;
+// }
+
+//Fibonachi
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 100
+
+int stack[MAX_SIZE];
+int top = -1;
+
+int isFull() {
+    return top == MAX_SIZE - 1;
+}
+
+int isEmpty() {
+    return top == -1;
+}
+
+void push(int value) {
+    if (!isFull()) {
+        stack[++top] = value;
+    } else {
+        printf("Stack Overflow\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+int pop() {
+    if (!isEmpty()) {
+        return stack[top--];
+    } else {
+        printf("Stack Underflow\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void fibonacciUsingStack(int n) {
+    int i, term1 = 0, term2 = 1;
+
+    for (i = 0; i < n; ++i) {
+        printf("%d ", term1);
+        push(term1);
+        int nextTerm = term1 + term2;
+        term1 = term2;
+        term2 = nextTerm;
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int numTerms;
+
+    printf("Enter the number of terms for the Fibonacci series: ");
+    scanf("%d", &numTerms);
+
+    if (numTerms <= 0) {
+        printf("Number of terms should be greater than 0.\n");
+        return 1;
+    }
+
+    printf("Fibonacci series using stack: ");
+    fibonacciUsingStack(numTerms);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+5.Circular Double Ended Queue
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 5
+
+// Structure to represent the circular queue
+struct CircularQueue {
+    int data[MAX_SIZE];
+    int front, rear;
+};
+
+// Function to initialize the circular queue
+void initialize(struct CircularQueue *queue) {
+    queue->front = queue->rear = -1;
+}
+
+// Function to check if the queue is full
+int isFull(struct CircularQueue *queue) {
+    return (queue->front == 0 && queue->rear == MAX_SIZE - 1) || (queue->rear == (queue->front - 1) % (MAX_SIZE - 1));
+}
+
+// Function to check if the queue is empty
+int isEmpty(struct CircularQueue *queue) {
+    return queue->front == -1;
+}
+
+// Function to enqueue at the rear of the queue
+void enqueueRear(struct CircularQueue *queue, int value) {
+    if (isFull(queue)) {
+        printf("Queue is full. Cannot enqueue.\n");
+    } else {
+        if (isEmpty(queue)) {
+            queue->front = queue->rear = 0;
+        } else {
+            queue->rear = (queue->rear + 1) % MAX_SIZE;
+        }
+        queue->data[queue->rear] = value;
+        printf("Enqueued %d at the rear.\n", value);
+    }
+}
+
+// Function to enqueue at the front of the queue
+void enqueueFront(struct CircularQueue *queue, int value) {
+    if (isFull(queue)) {
+        printf("Queue is full. Cannot enqueue.\n");
+    } else {
+        if (isEmpty(queue)) {
+            queue->front = queue->rear = 0;
+        } else {
+            queue->front = (queue->front - 1 + MAX_SIZE) % MAX_SIZE;
+        }
+        queue->data[queue->front] = value;
+        printf("Enqueued %d at the front.\n", value);
+    }
+}
+
+// Function to dequeue from the front of the queue
+int dequeueFront(struct CircularQueue *queue) {
+    int value;
+    if (isEmpty(queue)) {
+        printf("Queue is empty. Cannot dequeue.\n");
+        return -1;
+    } else {
+        value = queue->data[queue->front];
+        if (queue->front == queue->rear) {
+            // If the queue has only one element
+            initialize(queue);
+        } else {
+            queue->front = (queue->front + 1) % MAX_SIZE;
+        }
+        printf("Dequeued %d from the front.\n", value);
+        return value;
+    }
+}
+
+// Function to dequeue from the rear of the queue
+int dequeueRear(struct CircularQueue *queue) {
+    int value;
+    if (isEmpty(queue)) {
+        printf("Queue is empty. Cannot dequeue.\n");
+        return -1;
+    } else {
+        value = queue->data[queue->rear];
+        if (queue->front == queue->rear) {
+            // If the queue has only one element
+            initialize(queue);
+        } else {
+            queue->rear = (queue->rear - 1 + MAX_SIZE) % MAX_SIZE;
+        }
+        printf("Dequeued %d from the rear.\n", value);
+        return value;
+    }
+}
+
+// Function to display the elements of the queue
+void display(struct CircularQueue *queue) {
+    if (isEmpty(queue)) {
+        printf("Queue is empty.\n");
+    } else {
+        printf("Queue elements: ");
+        int i = queue->front;
+        do {
+            printf("%d ", queue->data[i]);
+            i = (i + 1) % MAX_SIZE;
+        } while (i != (queue->rear + 1) % MAX_SIZE);
+        printf("\n");
+    }
+}
+
+int main() {
+    struct CircularQueue queue;
+    initialize(&queue);
+
+    int choice, value;
+
+    do {
+        printf("\n----- Menu -----\n");
+        printf("1. Enqueue at Front\n");
+        printf("2. Enqueue at Rear\n");
+        printf("3. Dequeue from Front\n");
+        printf("4. Dequeue from Rear\n");
+        printf("5. Display\n");
+        printf("0. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value to enqueue at front: ");
+                scanf("%d", &value);
+                enqueueFront(&queue, value);
+                break;
+            case 2:
+                printf("Enter value to enqueue at rear: ");
+                scanf("%d", &value);
+                enqueueRear(&queue, value);
+                break;
+            case 3:
+                dequeueFront(&queue);
+                break;
+            case 4:
+                dequeueRear(&queue);
+                break;
+            case 5:
+                display(&queue);
+                break;
+            case 0:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    } while (choice != 0);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+6.
+
+
+
+
+
+
+
+
+
+
+//7. Polynomial Add Using LL
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent a term in the polynomial
+struct Term {
+    int coefficient;
+    int exponent;
+    struct Term* next;
+};
+
+// Function to create a new term
+struct Term* createTerm(int coefficient, int exponent) {
+    struct Term* newTerm = (struct Term*)malloc(sizeof(struct Term));
+    if (newTerm == NULL) {
+        printf("Memory allocation error.\n");
+        exit(EXIT_FAILURE);
+    }
+    newTerm->coefficient = coefficient;
+    newTerm->exponent = exponent;
+    newTerm->next = NULL;
+    return newTerm;
+}
+
+// Function to insert a term at the end of the polynomial
+void insertTerm(struct Term** poly, int coefficient, int exponent) {
+    struct Term* newTerm = createTerm(coefficient, exponent);
+
+    if (*poly == NULL) {
+        *poly = newTerm;
+    } else {
+        struct Term* current = *poly;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newTerm;
+    }
+}
+
+// Function to add two polynomials
+struct Term* addPolynomials(struct Term* poly1, struct Term* poly2) {
+    struct Term* result = NULL;
+
+    while (poly1 != NULL || poly2 != NULL) {
+        int coef1 = (poly1 != NULL) ? poly1->coefficient : 0;
+        int coef2 = (poly2 != NULL) ? poly2->coefficient : 0;
+        int sumCoef = coef1 + coef2;
+
+        int expo1 = (poly1 != NULL) ? poly1->exponent : 0;
+        int expo2 = (poly2 != NULL) ? poly2->exponent : 0;
+        int maxExpo = (expo1 > expo2) ? expo1 : expo2;
+
+        insertTerm(&result, sumCoef, maxExpo);
+
+        if (poly1 != NULL) {
+            poly1 = poly1->next;
+        }
+        if (poly2 != NULL) {
+            poly2 = poly2->next;
+        }
+    }
+
+    return result;
+}
+
+// Function to display a polynomial
+void displayPolynomial(struct Term* poly) {
+    while (poly != NULL) {
+        printf("%dx^%d", poly->coefficient, poly->exponent);
+        poly = poly->next;
+        if (poly != NULL) {
+            printf(" + ");
+        }
+    }
+    printf("\n");
+}
+
+// Function to free the memory allocated for a polynomial
+void freePolynomial(struct Term* poly) {
+    struct Term* temp;
+    while (poly != NULL) {
+        temp = poly;
+        poly = poly->next;
+        free(temp);
+    }
+}
+
+int main() {
+    struct Term* poly1 = NULL;
+    struct Term* poly2 = NULL;
+
+    int n1, n2, coef, expo;
+
+    // Input for the first polynomial
+    printf("Enter the number of terms in the first polynomial: ");
+    scanf("%d", &n1);
+
+    printf("Enter the terms of the first polynomial (coefficient exponent):\n");
+    for (int i = 0; i < n1; ++i) {
+        scanf("%d %d", &coef, &expo);
+        insertTerm(&poly1, coef, expo);
+    }
+
+    // Input for the second polynomial
+    printf("Enter the number of terms in the second polynomial: ");
+    scanf("%d", &n2);
+
+    printf("Enter the terms of the second polynomial (coefficient exponent):\n");
+    for (int i = 0; i < n2; ++i) {
+        scanf("%d %d", &coef, &expo);
+        insertTerm(&poly2, coef, expo);
+    }
+
+    // Display the input polynomials
+    printf("\nFirst Polynomial: ");
+    displayPolynomial(poly1);
+
+    printf("Second Polynomial: ");
+    displayPolynomial(poly2);
+
+    // Add the polynomials and display the result
+    struct Term* result = addPolynomials(poly1, poly2);
+    printf("\nSum of the Polynomials: ");
+    displayPolynomial(result);
+
+    // Free the allocated memory
+    freePolynomial(poly1);
+    freePolynomial(poly2);
+    freePolynomial(result);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+//8. Reverse Linked List:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a Node structure for the linked list
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Function to create a new Node with given data
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a new Node at the end of the list
+void insertAtEnd(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+}
+
+// Function to reverse the linked list iteratively
+void reverseList(struct Node** head) {
+    struct Node *prev = NULL, *current = *head, *next = NULL;
+    
+    while (current != NULL) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    
+    *head = prev;
+}
+
+// Function to print the linked list
+void printList(struct Node* head) {
+    while (head != NULL) {
+        printf("%d -> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    int n, data;
+
+    // Take user input for the linked list
+    printf("Enter the number of elements in the list: ");
+    scanf("%d", &n);
+
+    printf("Enter the elements of the list:\n");
+    for (int i = 0; i < n; ++i) {
+        scanf("%d", &data);
+        insertAtEnd(&head, data);
+    }
+
+    // Print the original linked list
+    printf("Original Linked List: ");
+    printList(head);
+
+    // Reverse the linked list
+    reverseList(&head);
+
+    // Print the reversed linked list
+    printf("Reversed Linked List: ");
+    printList(head);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+//9. Doubly Linked List
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a Node structure for the doubly linked list
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+// Function to create a new Node with given data
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a new Node at the beginning of the list
+void insertAtBeginning(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        newNode->next = *head;
+        (*head)->prev = newNode;
+        *head = newNode;
+    }
+}
+
+// Function to insert a new Node at the end of the list
+void insertAtEnd(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->prev = temp;
+    }
+}
+
+// Function to delete a Node by value
+void deleteByValue(struct Node** head, int data) {
+    if (*head == NULL) {
+        printf("List is empty. Deletion not possible.\n");
+        return;
+    }
+
+    struct Node* temp = *head;
+
+    // Case 1: Node to be deleted is the first node
+    if (temp->data == data) {
+        *head = temp->next;
+        if (*head != NULL) {
+            (*head)->prev = NULL;
+        }
+        free(temp);
+        return;
+    }
+
+    // Traverse the list to find the node to be deleted
+    while (temp != NULL && temp->data != data) {
+        temp = temp->next;
+    }
+
+    // Case 2: Node to be deleted is in the middle or end
+    if (temp != NULL) {
+        temp->prev->next = temp->next;
+        if (temp->next != NULL) {
+            temp->next->prev = temp->prev;
+        }
+        free(temp);
+    } else {
+        printf("Node with data %d not found.\n", data);
+    }
+}
+
+// Function to print the doubly linked list
+void printList(struct Node* head) {
+    while (head != NULL) {
+        printf("%d <-> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    int choice, data;
+
+    do {
+        printf("\nDoubly Linked List Operations:\n");
+        printf("1. Insert at the beginning\n");
+        printf("2. Insert at the end\n");
+        printf("3. Delete by value\n");
+        printf("4. Print the list\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the data to insert at the beginning: ");
+                scanf("%d", &data);
+                insertAtBeginning(&head, data);
+                break;
+            case 2:
+                printf("Enter the data to insert at the end: ");
+                scanf("%d", &data);
+                insertAtEnd(&head, data);
+                break;
+            case 3:
+                printf("Enter the data to delete: ");
+                scanf("%d", &data);
+                deleteByValue(&head, data);
+                break;
+            case 4:
+                printf("Doubly Linked List: ");
+                printList(head);
+                break;
+            case 5:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+//10. Merge Doubly Linked Lists
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a Node structure for the doubly linked list
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+// Function to create a new Node with given data
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a new Node at the end of the doubly linked list
+void insertAtEnd(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->prev = temp;
+    }
+}
+
+// Function to merge two sorted doubly linked lists
+struct Node* mergeSortedLists(struct Node* list1, struct Node* list2) {
+    struct Node* mergedList = NULL;
+    struct Node* temp;
+
+    while (list1 != NULL && list2 != NULL) {
+        if (list1->data < list2->data) {
+            insertAtEnd(&mergedList, list1->data);
+            list1 = list1->next;
+        } else {
+            insertAtEnd(&mergedList, list2->data);
+            list2 = list2->next;
+        }
+    }
+
+    // If there are remaining nodes in list1 or list2
+    while (list1 != NULL) {
+        insertAtEnd(&mergedList, list1->data);
+        list1 = list1->next;
+    }
+
+    while (list2 != NULL) {
+        insertAtEnd(&mergedList, list2->data);
+        list2 = list2->next;
+    }
+
+    return mergedList;
+}
+
+// Function to print the doubly linked list
+void printList(struct Node* head) {
+    while (head != NULL) {
+        printf("%d <-> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Node* list1 = NULL;
+    struct Node* list2 = NULL;
+    struct Node* mergedList = NULL;
+    int n, data;
+
+    // Input for the first sorted list
+    printf("Enter the number of elements for the first sorted list: ");
+    scanf("%d", &n);
+    printf("Enter the elements for the first sorted list:\n");
+    for (int i = 0; i < n; ++i) {
+        scanf("%d", &data);
+        insertAtEnd(&list1, data);
+    }
+
+    // Input for the second sorted list
+    printf("Enter the number of elements for the second sorted list: ");
+    scanf("%d", &n);
+    printf("Enter the elements for the second sorted list:\n");
+    for (int i = 0; i < n; ++i) {
+        scanf("%d", &data);
+        insertAtEnd(&list2, data);
+    }
+
+    // Merge the sorted lists
+    mergedList = mergeSortedLists(list1, list2);
+
+    // Print the merged list
+    printf("Merged Sorted List: ");
+    printList(mergedList);
+
+    return 0;
+}
+
+
+
+11.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//12. Add/Delete Of Queue on DLL:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a Node structure for the doubly linked list
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+// Define a Queue structure with front and rear pointers
+struct Queue {
+    struct Node* front;
+    struct Node* rear;
+};
+
+// Function to create a new Node with given data
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to initialize an empty queue
+struct Queue* createQueue() {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    queue->front = NULL;
+    queue->rear = NULL;
+    return queue;
+}
+
+// Function to add (enqueue) a new element to the queue
+void enqueue(struct Queue* queue, int data) {
+    struct Node* newNode = createNode(data);
+    if (queue->rear == NULL) {
+        queue->front = newNode;
+        queue->rear = newNode;
+    } else {
+        newNode->prev = queue->rear;
+        queue->rear->next = newNode;
+        queue->rear = newNode;
+    }
+}
+
+// Function to delete (dequeue) an element from the queue
+int dequeue(struct Queue* queue) {
+    if (queue->front == NULL) {
+        printf("Queue underflow. Cannot dequeue from an empty queue.\n");
+        return -1; // Assuming -1 is not a valid element in the queue
+    }
+
+    struct Node* temp = queue->front;
+    int dequeuedData = temp->data;
+
+    queue->front = temp->next;
+    if (queue->front != NULL) {
+        queue->front->prev = NULL;
+    } else {
+        queue->rear = NULL; // Reset rear if the last element is dequeued
+    }
+
+    free(temp);
+    return dequeuedData;
+}
+
+// Function to print the doubly linked list (queue)
+void printQueue(struct Queue* queue) {
+    struct Node* current = queue->front;
+    while (current != NULL) {
+        printf("%d -> ", current->data);
+        current = current->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Queue* myQueue = createQueue();
+    int choice, data;
+
+    do {
+        printf("\nQueue Operations:\n");
+        printf("1. Enqueue\n");
+        printf("2. Dequeue\n");
+        printf("3. Print Queue\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the data to enqueue: ");
+                scanf("%d", &data);
+                enqueue(myQueue, data);
+                break;
+            case 2:
+                data = dequeue(myQueue);
+                if (data != -1) {
+                    printf("Dequeued element: %d\n", data);
+                }
+                break;
+            case 3:
+                printf("Queue: ");
+                printQueue(myQueue);
+                break;
+            case 4:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    } while (choice != 4);
+
+    // Clean up remaining nodes in the queue
+    while (myQueue->front != NULL) {
+        struct Node* temp = myQueue->front;
+        myQueue->front = myQueue->front->next;
+        free(temp);
+    }
+
+    // Free the Queue structure
+    free(myQueue);
+
+    return 0;
+}
+
+
+//13-17. Binary Tree
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_STACK_SIZE 100
+
+struct treenode {
+    char data;
+    struct treenode* left;
+    struct treenode* right;
+};
+
+struct Stack {
+    int top;
+    struct treenode* array[MAX_STACK_SIZE];
+};
+
+struct Queue {
+    int front, rear;
+    struct treenode* array[MAX_STACK_SIZE];
+};
+
+struct treenode* createNode(char data) {
+    struct treenode* newNode = (struct treenode*)malloc(sizeof(struct treenode));
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+struct Stack* createStack() {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->top = -1;
+    return stack;
+}
+
+struct Queue* createQueue() {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    queue->front = queue->rear = 0;
+    return queue;
+}
+
+int isEmptyStack(struct Stack* stack) {
+    return stack->top == -1;
+}
+
+int isFullStack(struct Stack* stack) {
+    return stack->top == MAX_STACK_SIZE - 1;
+}
+
+void push(struct Stack* stack, struct treenode* item) {
+    if (isFullStack(stack)) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    stack->array[++stack->top] = item;
+}
+
+struct treenode* pop(struct Stack* stack) {
+    if (isEmptyStack(stack)) {
+        printf("Stack Underflow\n");
+        exit(1);
+    }
+    return stack->array[stack->top--];
+}
+
+int isEmptyQueue(struct Queue* queue) {
+    return queue->front == queue->rear;
+}
+
+void enqueue(struct Queue* queue, struct treenode* item) {
+    if (queue->rear == MAX_STACK_SIZE) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    queue->array[queue->rear++] = item;
+}
+
+struct treenode* dequeue(struct Queue* queue) {
+    if (isEmptyQueue(queue)) {
+        printf("Queue Underflow\n");
+        exit(1);
+    }
+    return queue->array[queue->front++];
+}
+
+void preorderTraversal(struct treenode* root) {
+    if (root == NULL)
+        return;
+    struct Stack* stack = createStack();
+    push(stack, root);
+    while (!isEmptyStack(stack)) {
+        struct treenode* current = pop(stack);
+        printf("%c ", current->data);
+        if (current->right != NULL)
+            push(stack, current->right);
+        if (current->left != NULL)
+            push(stack, current->left);
+    }
+    free(stack);
+}
+
+void inorderTraversal(struct treenode* root) {
+    if (root == NULL)
+        return;
+    struct Stack* stack = createStack();
+    struct treenode* current = root;
+    while (current != NULL || !isEmptyStack(stack)) {
+        while (current != NULL) {
+            push(stack, current);
+            current = current->left;
+        }
+        current = pop(stack);
+        printf("%c ", current->data);
+        current = current->right;
+    }
+    free(stack);
+}
+
+void postorderTraversal(struct treenode* root) {
+    if (root == NULL)
+        return;
+
+    struct Stack* stack1 = createStack();
+    struct Stack* stack2 = createStack();
+    push(stack1, root);
+    struct treenode* current;
+    while (!isEmptyStack(stack1)) {
+        current = pop(stack1);
+        push(stack2, current);
+
+        if (current->left != NULL)
+            push(stack1, current->left);
+
+        if (current->right != NULL)
+            push(stack1, current->right);
+    }
+    while (!isEmptyStack(stack2)) {
+        current = pop(stack2);
+        printf("%c ", current->data);
+    }
+    free(stack1);
+    free(stack2);
+}
+
+void levelOrderTraversal(struct treenode* root) {
+    if (root == NULL)
+        return;
+    struct Queue* queue = createQueue();
+    enqueue(queue, root);
+    while (!isEmptyQueue(queue)) {
+        struct treenode* current = dequeue(queue);
+        printf("%c ", current->data);
+        if (current->left != NULL)
+            enqueue(queue, current->left);
+        if (current->right != NULL)
+            enqueue(queue, current->right);
+    }
+    free(queue);
+}
+
+int countLeafNodes(struct treenode* root) {
+    if (root == NULL)
+        return 0;
+    struct Stack* stack = createStack();
+    int leafCount = 0;
+    push(stack, root);
+    while (!isEmptyStack(stack)) {
+        struct treenode* current = pop(stack);
+        if (!current->left && !current->right) {
+            leafCount++;
+        }
+        if (current->right)
+            push(stack, current->right);
+        if (current->left)
+            push(stack, current->left);
+    }
+    free(stack);
+    return leafCount;
+}
+
+void displayLeafNodes(struct treenode* root) {
+    if (root == NULL)
+        return;
+    struct Stack* stack = createStack();
+    push(stack, root);
+    while (!isEmptyStack(stack)) {
+        struct treenode* current = pop(stack);
+        if (!current->left && !current->right) {
+            printf("%c ", current->data);
+        }
+        if (current->right)
+            push(stack, current->right);
+        if (current->left)
+            push(stack, current->left);
+    }
+    printf("\n");
+    free(stack);
+}
+
+int countTotalNodes(struct treenode* root) {
+    if (root == NULL)
+        return 0;
+    struct Stack* stack = createStack();
+    int nodeCount = 0;
+    push(stack, root);
+    while (!isEmptyStack(stack)) {
+        struct treenode* current = pop(stack);
+        nodeCount++;
+        if (current->right)
+            push(stack, current->right);
+        if (current->left)
+            push(stack, current->left);
+    }
+    free(stack);
+    return nodeCount;
+}
+
+int height(struct treenode* root) {
+    if (root == NULL)
+        return 0;
+    struct Queue* queue = createQueue();
+    enqueue(queue, root);
+    int height = 0;
+    while (1) {
+        int nodeCount = queue->rear - queue->front;
+        if (nodeCount == 0)
+            return height;
+        height++;
+        while (nodeCount > 0) {
+            struct treenode* current = dequeue(queue);
+            if (current->left)
+                enqueue(queue, current->left);
+            if (current->right)
+                enqueue(queue, current->right);
+            nodeCount--;
+        }
+    }
+}
+
+void mirror(struct treenode* root) {
+    if (root == NULL)
+        return;
+    struct Stack* stack = createStack();
+    push(stack, root);
+    while (!isEmptyStack(stack)) {
+        struct treenode* current = pop(stack);
+        struct treenode* temp = current->left;
+        current->left = current->right;
+        current->right = temp;
+        if (current->right)
+            push(stack, current->right);
+        if (current->left)
+            push(stack, current->left);
+    }
+    free(stack);
+}
+
+int main() {
+    struct treenode* root = createNode('A');
+    root->left = createNode('C');
+    root->right = createNode('B');
+    root->left->left = createNode('D');
+    root->left->right = createNode('E');
+    root->left->right->left = createNode('H');
+    root->left->left->right = createNode('I');
+    root->right->right = createNode('G');
+    root->right->left = createNode('F');
+    root->right->left->right = createNode('K');
+    root->right->left->left = createNode('J');
+    root->right->right->left = createNode('L');
+
+    printf("Preorder traversal: ");
+    preorderTraversal(root);
+    printf("\n");
+
+    printf("Inorder traversal: ");
+    inorderTraversal(root);
+    printf("\n");
+
+    printf("Postorder traversal: ");
+    postorderTraversal(root);
+    printf("\n");
+
+    printf("Level Order traversal: ");
+    levelOrderTraversal(root);
+    printf("\n");
+
+    printf("Leaf Node Count: %d\n", countLeafNodes(root));
+
+    printf("Leaf Nodes: ");
+    displayLeafNodes(root);
+
+    printf("Total Node Count: %d\n", countTotalNodes(root));
+
+    printf("Height of Tree: %d\n", height(root));
+
+    mirror(root);
+    printf("Mirror Image Inorder traversal: ");
+    inorderTraversal(root);
+    printf("\n");
+
+    return 0;
+}
+
+
+
+
+
+
+
+//18-25. BST:
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a tree node
+struct Node {
+    int key;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int key) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->key = key;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node in the BST
+struct Node* insert(struct Node* root, int key) {
+    if (root == NULL) {
+        return createNode(key);
+    }
+    if (key < root->key) {
+        root->left = insert(root->left, key);
+    } else if (key > root->key) {
+        root->right = insert(root->right, key);
+    }
+    return root;
+}
+
+// Function to find the minimum value node in the BST
+struct Node* findMin(struct Node* node) {
+    struct Node* current = node;
+    while (current && current->left != NULL) {
+        current = current->left;
+    }
+    return current;
+}
+
+// Function to delete a node in the BST
+struct Node* deleteNode(struct Node* root, int key) {
+    if (root == NULL) {
+        return root;
+    }
+    if (key < root->key) {
+        root->left = deleteNode(root->left, key);
+    } else if (key > root->key) {
+        root->right = deleteNode(root->right, key);
+    } else {
+        if (root->left == NULL) {
+            struct Node* temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+        struct Node* temp = findMin(root->right);
+        root->key = temp->key;
+        root->right = deleteNode(root->right, temp->key);
+    }
+    return root;
+}
+
+// Function to find a node in the BST
+struct Node* find(struct Node* root, int key) {
+    if (root == NULL || root->key == key) {
+        return root;
+    }
+    if (key < root->key) {
+        return find(root->left, key);
+    } else {
+        return find(root->right, key);
+    }
+}
+
+// Function to create the mirror image of the BST (non-recursive)
+void mirrorImageNonRecursive(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    struct Node* stack[100];
+    int top = -1;
+    stack[++top] = root;
+
+    while (top >= 0) {
+        struct Node* node = stack[top--];
+        struct Node* temp = node->left;
+        node->left = node->right;
+        node->right = temp;
+
+        if (node->left) {
+            stack[++top] = node->left;
+        }
+        if (node->right) {
+            stack[++top] = node->right;
+        }
+    }
+}
+
+// Function to display the BST level-wise (non-recursive)
+void levelWiseDisplayNonRecursive(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    struct Node* queue[100];
+    int front = 0, rear = 0;
+    queue[rear++] = root;
+
+    while (front < rear) {
+        int levelNodes = rear - front;
+        while (levelNodes--) {
+            struct Node* temp = queue[front++];
+            printf("%d ", temp->key);
+            if (temp->left) {
+                queue[rear++] = temp->left;
+            }
+            if (temp->right) {
+                queue[rear++] = temp->right;
+            }
+        }
+        printf("\n");
+    }
+}
+
+// Function to calculate the height of the BST (non-recursive)
+int heightNonRecursive(struct Node* root) {
+    if (root == NULL) {
+        return -1;
+    }
+    int height = 0;
+    struct Node* queue[100];
+    int front = 0, rear = 0;
+    queue[rear++] = root;
+
+    while (front < rear) {
+        int levelNodes = rear - front;
+        while (levelNodes--) {
+            struct Node* temp = queue[front++];
+            if (temp->left) {
+                queue[rear++] = temp->left;
+            }
+            if (temp->right) {
+                queue[rear++] = temp->right;
+            }
+        }
+        height++;
+    }
+    return height - 1;
+}
+
+// Function to display the leaf nodes of the BST
+void displayLeafNodes(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    if (root->left == NULL && root->right == NULL) {
+        printf("%d ", root->key);
+    }
+    displayLeafNodes(root->left);
+    displayLeafNodes(root->right);
+}
+
+// Function to count the number of leaf nodes in the BST
+int countLeafNodes(struct Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+    if (root->left == NULL && root->right == NULL) {
+        return 1;
+    }
+    return countLeafNodes(root->left) + countLeafNodes(root->right);
+}
+
+// Function to count the total number of nodes in the BST
+int countTotalNodes(struct Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+    return 1 + countTotalNodes(root->left) + countTotalNodes(root->right);
+}
+
+// Function for non-recursive inorder traversal
+void inorderTraversal(struct Node* root) {
+    struct Node* stack[100];
+    int top = -1;
+    struct Node* current = root;
+
+    while (current != NULL || top >= 0) {
+        while (current != NULL) {
+            stack[++top] = current;
+            current = current->left;
+        }
+        current = stack[top--];
+        printf("%d ", current->key);
+        current = current->right;
+    }
+}
+
+// Function for non-recursive preorder traversal
+void preorderTraversal(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    struct Node* stack[100];
+    int top = -1;
+    stack[++top] = root;
+
+    while (top >= 0) {
+        struct Node* node = stack[top--];
+        printf("%d ", node->key);
+
+        if (node->right) {
+            stack[++top] = node->right;
+        }
+        if (node->left) {
+            stack[++top] = node->left;
+        }
+    }
+}
+
+// Function for non-recursive postorder traversal
+void postorderTraversal(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    struct Node* stack1[100];
+    struct Node* stack2[100];
+    int top1 = -1, top2 = -1;
+    stack1[++top1] = root;
+
+    while (top1 >= 0) {
+        struct Node* node = stack1[top1--];
+        stack2[++top2] = node;
+
+        if (node->left) {
+            stack1[++top1] = node->left;
+        }
+        if (node->right) {
+            stack1[++top1] = node->right;
+        }
+    }
+
+    while (top2 >= 0) {
+        struct Node* node = stack2[top2--];
+        printf("%d ", node->key);
+    }
+}
+
+// Main function
+int main() {
+    struct Node* root = NULL;
+    int choice, data, key;
+
+    while (1) {
+        printf("\nBinary Tree Operations\n");
+        printf("1. Insert Node\n");
+        printf("2. Delete Node\n");
+        printf("3. Mirror Image (Non-Recursive)\n");
+        printf("4. Level-wise Display (Non-Recursive)\n");
+        printf("5. Height of tree (Non-Recursive)\n");
+        printf("6. Display leaf nodes\n");
+        printf("7. Display number of leaf nodes\n");
+        printf("8. Display total number of nodes\n");
+        printf("9. Inorder Traversal (Non-Recursive)\n");
+        printf("10. Preorder Traversal (Non-Recursive)\n");
+        printf("11. Postorder Traversal (Non-Recursive)\n");
+        printf("12. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the element to insert: ");
+                scanf("%d", &data);
+                root = insert(root, data);
+                printf("Node inserted successfully!\n");
+                break;
+            case 2:
+                printf("Enter element to delete: ");
+                scanf("%d", &key);
+                root = deleteNode(root, key);
+                printf("Node deleted successfully!\n");
+                break;
+            case 3:
+                printf("Mirror Image of the BST (Non-Recursive): \n");
+                mirrorImageNonRecursive(root);
+                levelWiseDisplayNonRecursive(root);
+                break;
+            case 4:
+                printf("Level-wise display of BST (Non-Recursive): \n");
+                levelWiseDisplayNonRecursive(root);
+                break;
+            case 5:
+                printf("Height of BST (Non-Recursive): ");
+                printf("%d", heightNonRecursive(root));
+                break;
+            case 6:
+                printf("Leaf Nodes of the BST: ");
+                displayLeafNodes(root);
+                break;
+            case 7:
+                printf("Number of Leaf Nodes: ");
+                printf("%d\n", countLeafNodes(root));
+                break;
+            case 8:
+                printf("Total Number of Nodes: ");
+                printf("%d\n", countTotalNodes(root));
+                break;
+            case 9:
+                printf("Inorder Traversal (Non-Recursive): ");
+                inorderTraversal(root);
+                break;
+            case 10:
+                printf("Preorder Traversal (Non-Recursive): ");
+                preorderTraversal(root);
+                break;
+            case 11:
+                printf("Postorder Traversal (Non-Recursive): ");
+                postorderTraversal(root);
+                break;
+            case 12:
+                printf("Exiting program...\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please enter a valid option.\n");
+        }
+    }
+
+    return 0;
+}
+
+//26. Employee Using Tree
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure for the Binary Search Tree
+struct Employee {
+    int empId;
+    char name[50];
+    struct Employee* left;
+    struct Employee* right;
+};
+
+// Function to create a new employee node
+struct Employee* createEmployee(int empId, const char* name) {
+    struct Employee* newNode = (struct Employee*)malloc(sizeof(struct Employee));
+    newNode->empId = empId;
+    snprintf(newNode->name, sizeof(newNode->name), "%s", name);
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert an employee into the Binary Search Tree
+struct Employee* insert(struct Employee* root, int empId, const char* name) {
+    if (root == NULL) {
+        return createEmployee(empId, name);
+    }
+
+    if (empId < root->empId) {
+        root->left = insert(root->left, empId, name);
+    } else if (empId > root->empId) {
+        root->right = insert(root->right, empId, name);
+    }
+
+    return root;
+}
+
+// Function to search for an employee by employee ID
+struct Employee* search(struct Employee* root, int empId) {
+    while (root != NULL && root->empId != empId) {
+        if (empId < root->empId) {
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+
+    return root;
+}
+
+// Function to perform in-order traversal (ascending order) of the Binary Search Tree
+void inOrderTraversal(struct Employee* root) {
+    if (root != NULL) {
+        inOrderTraversal(root->left);
+        printf("Emp ID: %d, Name: %s\n", root->empId, root->name);
+        inOrderTraversal(root->right);
+    }
+}
+
+// Function to deallocate memory for the Binary Search Tree
+void freeTree(struct Employee* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    freeTree(root->left);
+    freeTree(root->right);
+    free(root);
+}
+
+int main() {
+    struct Employee* root = NULL;
+    int choice, empId;
+    char name[50];
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Insert employee\n");
+        printf("2. Search employee\n");
+        printf("3. Display employees in ascending order (by emp ID)\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter employee ID: ");
+                scanf("%d", &empId);
+                printf("Enter employee name: ");
+                scanf("%s", name);
+                root = insert(root, empId, name);
+                break;
+
+            case 2:
+                printf("Enter employee ID to search: ");
+                scanf("%d", &empId);
+                struct Employee* result = search(root, empId);
+                if (result != NULL) {
+                    printf("Employee found - Emp ID: %d, Name: %s\n", result->empId, result->name);
+                } else {
+                    printf("Employee not found.\n");
+                }
+                break;
+
+            case 3:
+                printf("Employees in ascending order:\n");
+                inOrderTraversal(root);
+                break;
+
+            case 4:
+                // Free memory and exit
+                freeTree(root);
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
+
+
+
+//27&28. TBT
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct tbtNode {
+    int lbit, rbit;
+    int data;
+    struct tbtNode *left, *right;
+};
+
+struct tbtNode* insert(struct tbtNode *head, int key) {
+    struct tbtNode *temp, *p;
+    temp = (struct tbtNode*)malloc(sizeof(struct tbtNode));
+    temp->data = key;
+    temp->lbit = temp->rbit = 0;
+
+    if (head->left == NULL) {
+        head->left = temp;
+        head->lbit = 1;
+        temp->left = head;
+        temp->right = head;
+        return head;
+    }
+
+    p = head->left;
+
+    while (1) {
+        if (key < p->data && p->lbit == 1) {
+            p = p->left;
+        } else if (key > p->data && p->rbit == 1) {
+            p = p->right;
+        } else {
+            break;
+        }
+    }
+
+    if (key < p->data) {
+        temp->right = p;
+        temp->left = p->left;
+        p->lbit = 1;
+        p->left = temp;
+    } else {
+        temp->left = p;
+        temp->right = p->right;
+        p->rbit = 1;
+        p->right = temp;
+    }
+
+    return head;
+}
+
+void preorder(struct tbtNode *head) {
+    struct tbtNode *p = head->left;
+
+    while (p != head) {
+        printf("%d ", p->data);
+
+        if (p->lbit == 1) {
+            p = p->left;
+        } else {
+            while (p->rbit == 0 && p->right != head) {
+                p = p->right;
+            }
+            p = p->right;
+        }
+    }
+}
+
+void inorder(struct tbtNode *head) {
+    struct tbtNode *p = head->left;
+    while (p->lbit == 1) {
+        p = p->left;
+    }
+
+    while (p != head) {
+        printf("%d ", p->data);
+
+        if (p->rbit == 1) {
+            p = p->right;
+            while (p->lbit == 1) {
+                p = p->left;
+            }
+        } else {
+            p = p->right;
+        }
+    }
+}
+
+
+
+
+
+int main() {
+    struct tbtNode *head = (struct tbtNode*)malloc(sizeof(struct tbtNode));
+    head->lbit = 0;
+    head->rbit = 0;
+    head->data = 0;
+    head->right = head;
+    head->left = NULL;
+
+    insert(head, 23);
+    insert(head, 12);
+    insert(head, 34);
+    insert(head, 59);
+    insert(head, 9);
+    insert(head, 11);
+
+    printf("Preorder traversal: ");
+    preorder(head);
+    printf("\n");
+
+    printf("Inorder traversal: ");
+    inorder(head);
+    printf("\n");
+    
+   
+    printf("\n");
+
+    return 0;
+}sss
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//29. AVL Tree
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int key;
+    struct Node *left;
+    struct Node *right;
+    int height;
+};
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+int height(struct Node *N) {
+    if (N == NULL)
+        return 0;
+    return N->height;
+}
+
+struct Node* newNode(int key) {
+    struct Node* node = (struct Node*) malloc(sizeof(struct Node));
+    node->key = key;
+    node->left = NULL;
+    node->right = NULL;
+    node->height = 1;
+    return node;
+}
+
+struct Node *rightRotate(struct Node *y) {
+    struct Node *x = y->left;
+    struct Node *T2 = x->right;
+
+    x->right = y;
+    y->left = T2;
+
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+
+struct Node *leftRotate(struct Node *x) {
+    struct Node *y = x->right;
+    struct Node *T2 = y->left;
+
+    y->left = x;
+    x->right = T2;
+
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+
+    return y;
+}
+
+int getBalance(struct Node *N) {
+    if (N == NULL)
+        return 0;
+    return height(N->left) - height(N->right);
+}
+
+struct Node* insert(struct Node* node, int key) {
+    if (node == NULL)
+        return newNode(key);
+
+    if (key < node->key)
+        node->left = insert(node->left, key);
+    else if (key > node->key)
+        node->right = insert(node->right, key);
+    else
+        return node;
+
+    node->height = 1 + max(height(node->left), height(node->right));
+
+    int balance = getBalance(node);
+
+    // Left Left Case
+    if (balance > 1 && key < node->left->key)
+        return rightRotate(node);
+
+    // Right Right Case
+    if (balance < -1 && key > node->right->key)
+        return leftRotate(node);
+
+    // Left Right Case
+    if (balance > 1 && key > node->left->key) {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+    // Right Left Case
+    if (balance < -1 && key < node->right->key) {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+    return node;
+}
+
+// Function to print the level order traversal of the AVL tree
+void printLevelOrder(struct Node *root) {
+    if (root == NULL)
+        return;
+
+    // Create an empty queue for level order traversal
+    struct Node **queue = (struct Node **)malloc(sizeof(struct Node *) * 1000);
+    int front = -1, rear = -1;
+
+    // Enqueue the root
+    queue[++rear] = root;
+    queue[++rear] = NULL; // Mark the end of the first level
+
+    while (front < rear) {
+        struct Node *temp = queue[++front];
+
+        if (temp != NULL) {
+            printf("%d ", temp->key);
+
+            // Enqueue left child
+            if (temp->left != NULL)
+                queue[++rear] = temp->left;
+
+            // Enqueue right child
+            if (temp->right != NULL)
+                queue[++rear] = temp->right;
+        } else {
+            // Move to the next level
+            if (front < rear) {
+                printf("\n");
+                queue[++rear] = NULL; // Mark the end of the next level
+            }
+        }
+    }
+
+    free(queue);
+}
+
+int main() {
+    struct Node *root = NULL;
+    int choice, key;
+
+    while (1) {
+        printf("1. Insert\n");
+        printf("2. Display Level Order Traversal\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the number to insert: ");
+                scanf("%d", &key);
+                root = insert(root, key);
+                break;
+            case 2:
+                printf("Level order traversal of the AVL tree is:\n");
+                printLevelOrder(root);
+                printf("\n");
+                break;
+            case 3:
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//30 & 32. BFS and DFS using Adjacency Matrix
+
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX 100
+
+// Queue for BFS
+int queue[MAX];
+int front = -1, rear = -1;
+
+// Stack for DFS
+int stack[MAX];
+int top = -1;
+
+// Function to enqueue a vertex in the queue for BFS
+void enqueue(int vertex) {
+    if (rear == MAX - 1) {
+        printf("Queue is full.\n");
+    } else {
+        if (front == -1) {
+            front = 0;
+        }
+        rear++;
+        queue[rear] = vertex;
+    }
+}
+
+// Function to dequeue a vertex from the queue for BFS
+int dequeue() {
+    int vertex;
+    if (front == -1) {
+        printf("Queue is empty.\n");
+        return -1;
+    } else {
+        vertex = queue[front];
+        front++;
+        if (front > rear) {
+            front = rear = -1;
+        }
+        return vertex;
+    }
+}
+
+// Function to push a vertex onto the stack for DFS
+void push(int vertex) {
+    if (top == MAX - 1) {
+        printf("Stack overflow.\n");
+    } else {
+        top++;
+        stack[top] = vertex;
+    }
+}
+
+// Function to pop a vertex from the stack for DFS
+int pop() {
+    int vertex;
+    if (top == -1) {
+        printf("Stack underflow.\n");
+        return -1;
+    } else {
+        vertex = stack[top];
+        top--;
+        return vertex;
+    }
+}
+
+// Function to perform BFS traversal
+void bfs(int adjacencyMatrix[MAX][MAX], int vertices, int startVertex) {
+    bool visited[MAX] = { false };
+    printf("BFS Traversal starting from vertex %d: ", startVertex);
+
+    visited[startVertex] = true;
+    enqueue(startVertex);
+
+    while (front != -1) {
+        int currentVertex = dequeue();
+        printf("%d ", currentVertex);
+
+        for (int i = 0; i < vertices; i++) {
+            if (adjacencyMatrix[currentVertex][i] == 1 && !visited[i]) {
+                visited[i] = true;
+                enqueue(i);
+            }
+        }
+    }
+    printf("\n");
+}
+
+// Function to perform DFS traversal
+void dfs(int adjacencyMatrix[MAX][MAX], int vertices, int startVertex, int visited[MAX]) {
+    push(startVertex);
+
+    printf("DFS Traversal starting from vertex %d: ", startVertex);
+
+    while (top != -1) {
+        int currentVertex = pop();
+
+        if (visited[currentVertex] == 0) {
+            printf("%d ", currentVertex);
+            visited[currentVertex] = 1;
+        }
+
+        for (int i = vertices - 1; i >= 0; i--) {
+            if (adjacencyMatrix[currentVertex][i] == 1 && visited[i] == 0) {
+                push(i);
+            }
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    int vertices, startVertex;
+    int adjacencyMatrix[MAX][MAX];
+    int visited[MAX] = {0};
+
+    printf("Enter the number of vertices: ");
+    scanf("%d", &vertices);
+
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < vertices; i++) {
+        for (int j = 0; j < vertices; j++) {
+            scanf("%d", &adjacencyMatrix[i][j]);
+        }
+    }
+
+    printf("Enter the start vertex: ");
+    scanf("%d", &startVertex);
+
+    bfs(adjacencyMatrix, vertices, startVertex);
+    // Reset visited array for DFS
+    for (int i = 0; i < MAX; i++) {
+        visited[i] = 0;
+    }
+    dfs(adjacencyMatrix, vertices, startVertex, visited);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+31&33. BFS DFS using Adj List
+
+//DFS using adjacency list
+#include <stdio.h>
+#include <stdlib.h>
+int inf = 999;
+struct stack
+{
+int data;
+struct stack *next;
+};
+struct graph
+{
+int vertex;
+struct graph *next;
+};
+struct stack *top = NULL;
+// isempty function
+int isempty()
+{
+if (top == NULL)
+return 1;
+else
+return 0;
+}
+// push operation
+void push(int data)
+{
+struct stack *node = (struct stack *)malloc(sizeof(struct stack));
+node->data = data;
+node->next = top;
+top = node;
+}
+// pop operation
+void pop()
+{
+if (isempty() == 1)
+return;
+struct stack *temp;
+temp = top;
+top = temp->next;
+free(temp);
+}
+void insert_list(int n, int v1, int v2, struct graph A[])
+{
+struct graph *temp = (struct graph *)malloc(sizeof(struct graph));
+temp->vertex = v1;
+temp->next = A[v2].next;
+A[v2].next = temp;
+struct graph *temp2 = (struct graph *)malloc(sizeof(struct graph));
+temp2->vertex = v2;
+temp2->next = A[v1].next;
+A[v1].next = temp2;
+return;
+}
+void DFS_list(struct graph A[], int n)
+{
+int visited[100], v;
+for (int i = 0; i < n; i++)
+{
+visited[i] = 0;
+}
+struct graph *p;
+printf("Enter the start vertex: ");
+scanf("%d", &v);
+push(v);
+printf("The DFS Traversal is :");
+printf(" %d -> ", v);
+visited[v] = 1;
+do
+{
+p = A[v].next;
+while (p != NULL)
+{
+if (visited[p->vertex] == 0)
+{
+printf(" %d -> ", p->vertex);
+push(p->vertex);
+visited[p->vertex] = 1;
+v = p->vertex;
+break;
+}
+else
+p = p->next;
+}
+if (p == NULL)
+{
+pop();
+if (!isempty())
+v = top->data;
+}
+} while (!isempty());
+}
+int main()
+{
+struct graph A[100];
+int E, V, v1, v2, decision;
+printf("Enter the no. of vertices:");
+scanf("%d", &V);
+for (int i = 0; i < V; i++)
+{
+A[i].vertex = i;
+A[i].next = NULL;
+}
+do
+{
+printf("Enter Yes(1) to have a edge else No(0):");
+scanf("%d", &decision);
+if (decision == 1)
+{
+printf("Enter the vertices where the edge you want :");
+scanf("%d %d", &v1, &v2);
+insert_list(V, v1, v2, A);
+}
+} while (decision == 1);
+DFS_list(A, V);
+return 0;
+}
+
+
+
+
+
+
+//BFS using Ajacency List
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 50
+
+// This struct represents a directed graph using
+// adjacency list representation
+typedef struct Graph_t {
+
+    // No. of vertices
+    int V;
+    bool adj[MAX_VERTICES][MAX_VERTICES];
+} Graph;
+
+// Constructor
+Graph* Graph_create(int V)
+{
+    Graph* g = malloc(sizeof(Graph));
+    g->V = V;
+
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            g->adj[i][j] = false;
+        }
+    }
+
+    return g;
+}
+
+// Destructor
+void Graph_destroy(Graph* g) { free(g); }
+
+// Function to add an edge to graph
+void Graph_addEdge(Graph* g, int v, int w)
+{
+    // Add w to v’s list.
+    g->adj[v][w] = true;
+}
+
+// Prints BFS traversal from a given source s
+void Graph_BFS(Graph* g, int s)
+{
+    // Mark all the vertices as not visited
+    bool visited[MAX_VERTICES];
+    for (int i = 0; i < g->V; i++) {
+        visited[i] = false;
+    }
+
+    // Create a queue for BFS
+    int queue[MAX_VERTICES];
+    int front = 0, rear = 0;
+
+    // Mark the current node as visited and enqueue it
+    visited[s] = true;
+    queue[rear++] = s;
+
+    while (front != rear) {
+
+        // Dequeue a vertex from queue and print it
+        s = queue[front++];
+        printf("%d ", s);
+
+        // Get all adjacent vertices of the dequeued
+        // vertex s.
+        // If an adjacent has not been visited,
+        // then mark it visited and enqueue it
+        for (int adjacent = 0; adjacent < g->V;
+            adjacent++) {
+            if (g->adj[s][adjacent] && !visited[adjacent]) {
+                visited[adjacent] = true;
+                queue[rear++] = adjacent;
+            }
+        }
+    }
+}
+
+// Driver code
+int main()
+{
+    int numVertices, numEdges;
+
+    // Get the number of vertices from the user
+    printf("Enter the number of vertices: ");
+    scanf("%d", &numVertices);
+
+    // Create a graph
+    Graph* g = Graph_create(numVertices);
+
+    // Get the number of edges from the user
+    printf("Enter the number of edges: ");
+    scanf("%d", &numEdges);
+
+    // Get edges from the user
+    for (int i = 0; i < numEdges; i++) {
+        int v, w;
+        printf("Enter edge (vertex1 vertex2): ");
+        scanf("%d %d", &v, &w);
+        Graph_addEdge(g, v, w);
+    }
+
+    // Choose a starting vertex for BFS
+    int startVertex;
+    printf("Enter the starting vertex for BFS: ");
+    scanf("%d", &startVertex);
+
+    printf("Following is Breadth First Traversal "
+        "(starting from vertex %d) \n", startVertex);
+    Graph_BFS(g, startVertex);
+    Graph_destroy(g);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+34. Prim’s Algorithm
+
+//List
+
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h> // For malloc
+
+#define MAX_NODES 1001
+#define INF 99
+
+struct Node {
+    int vertex;
+    int weight;
+    struct Node* next;
+};
+
+struct Node* createNode(int v, int w) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = v;
+    newNode->weight = w;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void addEdge(struct Node* adj[], int u, int v, int w) {
+    struct Node* newNode = createNode(v, w);
+    newNode->next = adj[u];
+    adj[u] = newNode;
+
+    newNode = createNode(u, w);
+    newNode->next = adj[v];
+    adj[v] = newNode;
+}
+
+void primMST(struct Node* adj[], int V) {
+    int parent[V];
+    int val[V];
+    bool vis[V];
+
+    for (int i = 0; i < V; i++) {
+        val[i] = INF;
+        vis[i] = false;
+        parent[i] = -1;
+    }
+
+    val[0] = 0;
+    parent[0] = 0;
+
+    for (int count = 0; count < V - 1; count++) {
+        int u = -1;
+        for (int i = 0; i < V; i++) {
+            if (!vis[i] && (u == -1 || val[i] < val[u])) {
+                u = i;
+            }
+        }
+
+        vis[u] = true;
+
+        struct Node* temp = adj[u];
+        while (temp != NULL) {
+            int v = temp->vertex;
+            int weight = temp->weight;
+            if (!vis[v] && weight < val[v]) {
+                parent[v] = u;
+                val[v] = weight;
+            }
+            temp = temp->next;
+        }
+    }
+
+    printf("Edge \tWeight\n");
+    for (int i = 1; i < V; i++) {
+        printf("%d - %d \t%d \n", parent[i], i, val[i]);
+    }
+    
+}
+
+int main() {
+    int V;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &V);
+
+    struct Node* adj[V];
+    for (int i = 0; i < V; i++) {
+        adj[i] = NULL;
+    }
+
+    int E;
+    printf("Enter the number of edges: ");
+    scanf("%d", &E);
+
+    printf("Enter the edges (u v w) and their weights:\n");
+    for (int i = 0; i < E; i++) {
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        addEdge(adj, u, v, w);
+    }
+
+    primMST(adj, V);
+
+    return 0;
+}
+
+
+//Matrix:
+
+//Matrix
+
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_VERTICES 100
+#define INFINITY 99  // Your chosen representation for infinity
+
+// Function to find the vertex with the minimum key value
+int findMinKeyVertex(int key[], bool mstSet[], int n) {
+    int minKey = __INT_MAX__, minIndex;
+    
+    for (int v = 0; v < n; v++) {
+        if (!mstSet[v] && key[v] < minKey) {
+            minKey = key[v];
+            minIndex = v;
+        }
+    }   
+    return minIndex;
+}
+
+// Function to print the MST
+void printMST(int parent[], int graph[MAX_VERTICES][MAX_VERTICES], int n) {
+    printf("Edge \tWeight\n");
+    for (int i = 1; i < n; i++) {
+        printf("%d - %d: \t%d\n", parent[i], i, graph[i][parent[i]]);
+    }
+}
+
+void primMST(int graph[MAX_VERTICES][MAX_VERTICES], int n) {
+    int parent[MAX_VERTICES];
+    int key[MAX_VERTICES];
+    bool mstSet[MAX_VERTICES];
+    
+    for (int i = 0; i < n; i++) {
+        key[i] = INFINITY;  // Using your chosen infinity value
+        mstSet[i] = false;
+    }
+    key[0] = 0;
+    parent[0] = -1;
+    
+    for (int count = 0; count < n - 1; count++) {
+        int u = findMinKeyVertex(key, mstSet, n);   // Pick the minimum key vertex
+        
+        mstSet[u] = true;   // Include the picked vertex in MST
+        
+        // Update key values and parent index of the adjacent vertices of the picked vertex
+        for (int v = 0; v < n; v++) {
+            if (graph[u][v]!= 0 && !mstSet[v] && graph[u][v] < key[v]) {
+                parent[v] = u;
+                key[v] = graph[u][v];
+            }
+        }
+    }
+    // Print the constructed MST
+    printMST(parent, graph, n);
+}
+
+int main() {
+    int n;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &n);
+    
+    int graph[MAX_VERTICES][MAX_VERTICES];
+    printf("Enter the adjacency matrix with distance:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }  
+    primMST(graph, n);  
+    return 0;
+}
+
+
+
+
+
+35. Kruskals Algorithm using list
+
+
+//list
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent an edge in the graph
+struct Edge {
+    int src, dest, weight;
+};
+
+// Structure to represent a disjoint set
+struct DisjointSet {
+    int *parent, *rank;
+    int n;
+};
+
+// Create a new DisjointSet with 'n' elements
+struct DisjointSet* createDisjointSet(int n) {
+    struct DisjointSet* ds = (struct DisjointSet*)malloc(sizeof(struct DisjointSet));
+    ds->n = n;
+    ds->parent = (int*)malloc(n * sizeof(int));
+    ds->rank = (int*)malloc(n * sizeof(int));
+
+    for (int i = 0; i < n; i++) {
+        ds->parent[i] = i;
+        ds->rank[i] = 0;
+    }
+
+    return ds;
+}
+
+// Find the set of an element 'x'
+int find(struct DisjointSet* ds, int x) {
+    if (ds->parent[x] != x)
+        ds->parent[x] = find(ds, ds->parent[x]);
+    return ds->parent[x];
+}
+
+// Union of two sets
+void Union(struct DisjointSet* ds, int x, int y) {
+    int xroot = find(ds, x);
+    int yroot = find(ds, y);
+
+    if (ds->rank[xroot] < ds->rank[yroot])
+        ds->parent[xroot] = yroot;
+    else if (ds->rank[xroot] > ds->rank[yroot])
+        ds->parent[yroot] = xroot;
+    else {
+        ds->parent[yroot] = xroot;
+        ds->rank[xroot]++;
+    }
+}
+
+// Structure to represent a graph
+struct Graph {
+    int V, E;
+    struct Edge* edge;
+};
+
+// Create a new graph with 'V' vertices and 'E' edges
+struct Graph* createGraph(int V, int E) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->V = V;
+    graph->E = E;
+    graph->edge = (struct Edge*)malloc(E * sizeof(struct Edge));
+    return graph;
+}
+
+// Comparator function to sort edges by weight
+int compare(const void* a, const void* b) {
+    return ((struct Edge*)a)->weight - ((struct Edge*)b)->weight;
+}
+
+// Kruskal's MST algorithm
+void KruskalMST(struct Graph* graph) {
+    int V = graph->V;
+    struct Edge result[V];
+    int e = 0;
+    int i = 0;
+
+    // Sort the edges in non-decreasing order of their weight
+    qsort(graph->edge, graph->E, sizeof(graph->edge[0]), compare);
+
+    // Create a disjoint set to keep track of connected components
+    struct DisjointSet* ds = createDisjointSet(V);
+
+    while (e < V - 1 && i < graph->E) {
+        struct Edge nextEdge = graph->edge[i++];
+        int x = find(ds, nextEdge.src);
+        int y = find(ds, nextEdge.dest);
+
+        if (x != y) {
+            result[e++] = nextEdge;
+            Union(ds, x, y);
+        }
+    }
+    printf("Edges in the Minimum Spanning Tree:\n");
+    for (i = 0; i < e; i++) {
+        printf("%d - %d (Weight: %d)\n", result[i].src, result[i].dest, result[i].weight);
+    }
+}
+
+int main() {
+    int V, E;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &V);
+    printf("Enter the number of edges: ");
+    scanf("%d", &E);
+
+    struct Graph* graph = createGraph(V, E);
+
+    printf("Enter the edges (source, destination, weight):\n");
+    for (int i = 0; i < E; i++) {
+        scanf("%d %d %d", &graph->edge[i].src, &graph->edge[i].dest, &graph->edge[i].weight);
+    }
+
+    KruskalMST(graph);
+    return 0;
+}
+
+
+
+
+
+36. Kruskal’s Algorithm using Matrix
+
+
+//matrix
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define INF 999
+
+struct graph
+{
+    int vertex;
+    int weight;
+    struct graph *next;
+};
+
+int parent[100];
+
+void insert_list(int n, int v1, int v2, struct graph A[])
+{
+    struct graph *temp = (struct graph *)malloc(sizeof(struct graph));
+    temp->vertex = v1;
+    temp->weight = 0; 
+    temp->next = A[v2].next;
+    A[v2].next = temp;
+
+    struct graph *temp2 = (struct graph *)malloc(sizeof(struct graph));
+    temp2->vertex = v2;
+    temp2->weight = 0; 
+    temp2->next = A[v1].next;
+    A[v1].next = temp2;
+}
+
+int find_parent(int i)
+{
+    while (parent[i] != i)
+        i = parent[i];
+    return i;
+}
+
+void change_parent(int i, int j)
+{
+    int x, r;
+    x = find_parent(i);
+    r = find_parent(j);
+    parent[x] = r;
+}
+
+void Kruskals(struct graph A[], int n)
+{
+    int a, b, cost = 0, min = INF, i, j, ne = 0;
+
+    for (i = 0; i < n; i++)
+        parent[i] = i;
+
+    while (ne < n - 1)
+    {
+        min = INF;
+
+        for (i = 0; i < n; i++)
+        {
+            struct graph *temp = &A[i];
+            struct graph *p = temp->next;
+
+            while (p != NULL)
+            {
+                if (find_parent(i) != find_parent(p->vertex) && p->weight < min)
+                {
+                    min = p->weight;
+                    a = p->vertex;
+                    b = i;
+                }
+                p = p->next;
+            }
+        }
+
+        change_parent(a, b);
+
+        struct graph *temp = &A[b];
+        struct graph *p = temp->next;
+        while (p->vertex != a)
+            p = p->next;
+        p->weight = INF;
+
+        cost += min;
+        ne++;
+    }
+
+    printf("The cost of the MST is: %d", cost);
+}
+
+int main()
+{
+    struct graph A[100];
+    int V, v1, v2, decision, weight;
+
+    printf("Enter the no. of vertices: ");
+    scanf("%d", &V);
+
+    for (int i = 0; i < V; i++)
+    {
+        A[i].vertex = i;
+        A[i].weight = 0;
+        A[i].next = NULL;
+    }
+
+    do
+    {
+        printf("Enter 1 to add an edge, or 0 to finish: ");
+        scanf("%d", &decision);
+        if (decision == 1)
+        {
+            printf("Enter the vertices for the edge: ");
+            scanf("%d %d", &v1, &v2);
+            printf("Enter the weight: ");
+            scanf("%d", &weight);
+            insert_list(V, v1, v2, A);
+            A[v1].next->weight = weight; 
+            A[v2].next->weight = weight; 
+        }
+    } while (decision == 1);
+
+    Kruskals(A, V);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+37. Dijksta using list
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+// Structure to represent a node in the adjacency list
+struct Node {
+    int dest;
+    int weight;
+    struct Node* next;
+};
+
+// Structure to represent the adjacency list
+struct AdjList {
+    struct Node* head;
+};
+
+// Structure to represent the graph
+struct Graph {
+    int V;
+    struct AdjList* array;
+};
+
+// Function to create a new node in the adjacency list
+struct Node* createNode(int dest, int weight) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->dest = dest;
+    newNode->weight = weight;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to create a graph with V vertices
+struct Graph* createGraph(int V) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->V = V;
+
+    // Allocate memory for an array of adjacency lists
+    graph->array = (struct AdjList*)malloc(V * sizeof(struct AdjList));
+
+    // Initialize each adjacency list as empty
+    for (int i = 0; i < V; ++i)
+        graph->array[i].head = NULL;
+
+    return graph;
+}
+
+// Function to add an edge to the graph
+void addEdge(struct Graph* graph, int src, int dest, int weight) {
+    // Add an edge from src to dest
+    struct Node* newNode = createNode(dest, weight);
+    newNode->next = graph->array[src].head;
+    graph->array[src].head = newNode;
+
+    // Add an edge from dest to src (assuming an undirected graph)
+    newNode = createNode(src, weight);
+    newNode->next = graph->array[dest].head;
+    graph->array[dest].head = newNode;
+}
+
+// Function to find the vertex with the minimum distance value
+int minDistance(int dist[], int sptSet[], int V) {
+    int min = INT_MAX, min_index;
+
+    for (int v = 0; v < V; v++) {
+        if (sptSet[v] == 0 && dist[v] <= min) {
+            min = dist[v];
+            min_index = v;
+        }
+    }
+
+    return min_index;
+}
+
+// Function to print the solution (distances from source)
+void printSolution(int dist[], int V) {
+    printf("Vertex   Distance from Source\n");
+    for (int i = 0; i < V; i++)
+        printf("%d \t\t %d\n", i, dist[i]);
+}
+
+// Function to implement Dijkstra's algorithm
+void dijkstra(struct Graph* graph, int src) {
+    int V = graph->V;
+    int dist[V];
+    int sptSet[V];
+
+    for (int i = 0; i < V; i++) {
+        dist[i] = INT_MAX;
+        sptSet[i] = 0;
+    }
+
+    dist[src] = 0;
+
+    for (int count = 0; count < V - 1; count++) {
+        int u = minDistance(dist, sptSet, V);
+
+        sptSet[u] = 1;
+
+        struct Node* temp = graph->array[u].head;
+        while (temp != NULL) {
+            int v = temp->dest;
+            int weight = temp->weight;
+            if (!sptSet[v] && dist[u] != INT_MAX && dist[u] + weight < dist[v])
+                dist[v] = dist[u] + weight;
+
+            temp = temp->next;
+        }
+    }
+
+    printSolution(dist, V);
+}
+
+int main() {
+    int V, E;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &V);
+
+    struct Graph* graph = createGraph(V);
+
+    printf("Enter the number of edges: ");
+    scanf("%d", &E);
+
+    printf("Enter the details of each edge (source, destination, weight):\n");
+    for (int i = 0; i < E; i++) {
+        int src, dest, weight;
+        printf("Edge %d: ", i + 1);
+        scanf("%d %d %d", &src, &dest, &weight);
+        addEdge(graph, src, dest, weight);
+    }
+
+    int source;
+    printf("Enter the source vertex: ");
+    scanf("%d", &source);
+
+    dijkstra(graph, source);
+
+    return 0;
+}
+
+
+
+
+38. Dijksta using Matrix
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define V 10 // Maximum number of vertices
+
+int minDistance(int dist[], int visited[], int n) {
+    int min = INT_MAX, min_index;
+
+    for (int v = 0; v < n; v++) {
+        if (!visited[v] && dist[v] < min) {
+            min = dist[v];
+            min_index = v;
+        }
+    }
+
+    return min_index;
+}
+
+void display(int dist[], int n) {
+    printf("Vertex   Distance from Source\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d        %d\n", i, dist[i]);
+    }
+}
+
+void dijkstra(int graph[V][V], int src, int n) {\
+    int dist[V];    
+    int visited[V];  
+
+    for (int i = 0; i < V; i++) {
+        dist[i] = INT_MAX;
+        visited[i] = 0;
+    }
+
+    dist[src] = 0;
+
+    // Find the shortest path for all vertices
+    for (int count = 0; count < n - 1; count++) {
+        int u = minDistance(dist, visited, n);
+
+        visited[u] = 1;
+
+        for (int v = 0; v < n; v++) {
+            if (!visited[v] && graph[u][v] && dist[u] != INT_MAX &&
+                dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+            }
+        }
+    }
+    display(dist, n);
+}
+
+int main() {
+    int graph[V][V];
+    int n; 
+    int src; 
+
+    printf("Enter the number of vertices (max %d): ", V);
+    scanf("%d", &n);
+
+    if (n <= 0 || n > V) {
+        printf("Invalid number of vertices.\n");
+        return 1;
+    }
+
+    printf("Enter the adjacency matrix (0 for no edge, positive values for edge weights):\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    printf("Enter the source vertex (0 to %d): ", n - 1);
+    scanf("%d", &src);
+
+    if (src < 0 || src >= n) {
+        printf("Invalid source vertex.\n");
+        return 1;
+    }
+
+    dijkstra(graph, src, n);
+
+    return 0;
+}
+
+
+
+
+//39 & 40. Student QuickSort & HeapSort
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Student {
+    char student_name[50];
+    int student_roll_no;
+    int total_marks;
+};
+
+// Function to swap two students
+void swap(struct Student *a, struct Student *b) {
+    struct Student temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Function to perform Heapify operation in Heap Sort
+void heapify(struct Student arr[], int n, int i, int *swapCount) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left].student_roll_no > arr[largest].student_roll_no)
+        largest = left;
+
+    if (right < n && arr[right].student_roll_no > arr[largest].student_roll_no)
+        largest = right;
+
+    if (largest != i) {
+        (*swapCount)++;
+        swap(&arr[i], &arr[largest]);
+        heapify(arr, n, largest, swapCount);
+    }
+}
+
+// Function to perform Heap Sort
+void heapSort(struct Student arr[], int n, int *swapCount) {
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i, swapCount);
+
+    for (int i = n - 1; i >= 0; i--) {
+        (*swapCount)++;
+        swap(&arr[0], &arr[i]);
+        heapify(arr, i, 0, swapCount);
+    }
+}
+
+// Function to partition the array for Quick Sort
+int partition(struct Student arr[], int low, int high, int *swapCount) {
+    struct Student pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j].student_roll_no <= pivot.student_roll_no) {
+            (*swapCount)++;
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    (*swapCount)++;
+    swap(&arr[i + 1], &arr[high]);
+    return i + 1;
+}
+
+// Function to perform Quick Sort
+void quickSort(struct Student arr[], int low, int high, int *swapCount) {
+    if (low < high) {
+        int pi = partition(arr, low, high, swapCount);
+
+        quickSort(arr, low, pi - 1, swapCount);
+        quickSort(arr, pi + 1, high, swapCount);
+    }
+}
+
+// Function to display the array of students
+void displayStudents(struct Student arr[], int n) {
+    printf("Student Details:\n");
+    printf("%-20s%-15s%-15s\n", "Student Name", "Roll Number", "Total Marks");
+    for (int i = 0; i < n; i++) {
+        printf("%-20s%-15d%-15d\n", arr[i].student_name, arr[i].student_roll_no, arr[i].total_marks);
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter the number of students: ");
+    scanf("%d", &n);
+
+    struct Student *students = (struct Student *)malloc(n * sizeof(struct Student));
+
+    // Input details of students
+    for (int i = 0; i < n; i++) {
+        printf("Enter details for student %d:\n", i + 1);
+        printf("Name: ");
+        scanf("%s", students[i].student_name);
+        printf("Roll Number: ");
+        scanf("%d", &students[i].student_roll_no);
+        printf("Total Marks: ");
+        scanf("%d", &students[i].total_marks);
+    }
+
+    int swapCountHeap = 0;
+    int swapCountQuick = 0;
+
+    // Copy the array for both algorithms
+    struct Student *studentsHeap = (struct Student *)malloc(n * sizeof(struct Student));
+    struct Student *studentsQuick = (struct Student *)malloc(n * sizeof(struct Student));
+
+    memcpy(studentsHeap, students, n * sizeof(struct Student));
+    memcpy(studentsQuick, students, n * sizeof(struct Student));
+
+    // Perform Heap Sort
+    heapSort(studentsHeap, n, &swapCountHeap);
+
+    // Perform Quick Sort
+    quickSort(studentsQuick, 0, n - 1, &swapCountQuick);
+
+    // Display sorted arrays and swap counts
+    printf("\nHeap Sort:\n");
+    displayStudents(studentsHeap, n);
+    printf("Number of swaps: %d\n", swapCountHeap);
+
+    printf("\nQuick Sort:\n");
+    displayStudents(studentsQuick, n);
+    printf("Number of swaps: %d\n", swapCountQuick);
+
+    // Free allocated memory
+    free(students);
+    free(studentsHeap);
+    free(studentsQuick);
+
+    return 0;
+}
+
+//41. Array Position Problem
+
+#include <stdio.h>
+
+void findSwappedPair(int arr[], int n) {
+    int first, second;
+
+    // Traverse the array to find the swapped elements
+    for (int i = 0; i < n - 1; i++) {
+        if (arr[i] > arr[i + 1]) {
+            first = i;
+            break;
+        }
+    }
+
+    for (int i = n - 1; i > 0; i--) {
+        if (arr[i] < arr[i - 1]) {
+            second = i;
+            break;
+        }
+    }
+
+    // Print the swapped elements and their positions
+    printf("Swapped elements: %d and %d\n", arr[first], arr[second]);
+    printf("Positions: %d and %d\n", first + 1, second + 1);
+}
+
+int main() {
+    int n;
+
+    // Take user input for the size of the array
+    printf("Enter the size of the array: ");
+    scanf("%d", &n);
+
+    int arr[n];
+
+    // Take user input for array elements
+    printf("Enter the elements of the array:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    // Call the function to find the swapped pair
+    findSwappedPair(arr, n);
+
+    return 0;
+}
+
+//42&43. Hashing
