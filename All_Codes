@@ -3784,131 +3784,91 @@ int main() {
 
 
 
+#include<stdio.h>
+#include<stdlib.h>
 
-//matrix
+#define MAX 10
 
-#include <stdio.h>
-#include <stdlib.h>
+int parent[MAX]; 
 
-#define INF 999
-
-struct graph
-{
-    int vertex;
-    int weight;
-    struct graph *next;
-};
-
-int parent[100];
-
-void insert_list(int n, int v1, int v2, struct graph A[])
-{
-    struct graph *temp = (struct graph *)malloc(sizeof(struct graph));
-    temp->vertex = v1;
-    temp->weight = 0; 
-    temp->next = A[v2].next;
-    A[v2].next = temp;
-
-    struct graph *temp2 = (struct graph *)malloc(sizeof(struct graph));
-    temp2->vertex = v2;
-    temp2->weight = 0; 
-    temp2->next = A[v1].next;
-    A[v1].next = temp2;
-}
-
-int find_parent(int i)
-{
-    while (parent[i] != i)
+int findparent(int i){
+    while(i != parent[i]){
         i = parent[i];
+    }
     return i;
 }
 
-void change_parent(int i, int j)
-{
-    int x, r;
-    x = find_parent(i);
-    r = find_parent(j);
-    parent[x] = r;
+void uni(int i , int j){
+    int a = findparent(i);
+    int b = findparent(j);
+    parent[b]= a;
 }
 
-void Kruskals(struct graph A[], int n)
-{
-    int a, b, cost = 0, min = INF, i, j, ne = 0;
+void krushkals(int G[][MAX],int v){
 
-    for (i = 0; i < n; i++)
+    int ne = 0;
+    int a, b; 
+
+    for(int i=0;i<v;i++){
         parent[i] = i;
+    }
 
-    while (ne < n - 1)
-    {
-        min = INF;
+    while(ne < v-1){
 
-        for (i = 0; i < n; i++)
-        {
-            struct graph *temp = &A[i];
-            struct graph *p = temp->next;
+        int min = 999; 
 
-            while (p != NULL)
-            {
-                if (find_parent(i) != find_parent(p->vertex) && p->weight < min)
-                {
-                    min = p->weight;
-                    a = p->vertex;
-                    b = i;
+        for(int i=0;i<v;i++){
+            for(int j=0;j<v;j++){
+                if(G[i][j] != 0 && G[i][j] < min && findparent(i) != findparent(j)){
+                    min = G[i][j];
+                    a = i;
+                    b = j;
                 }
-                p = p->next;
             }
         }
 
-        change_parent(a, b);
+        uni(a,b);
 
-        struct graph *temp = &A[b];
-        struct graph *p = temp->next;
-        while (p->vertex != a)
-            p = p->next;
-        p->weight = INF;
-
-        cost += min;
-        ne++;
+        printf("Edge %d :- %d %d => %d\n", ne++, a, b, min);
     }
-
-    printf("The cost of the MST is: %d", cost);
 }
 
-int main()
-{
-    struct graph A[100];
-    int V, v1, v2, decision, weight;
+int main() {
+    int v;
+    printf("Enter number of vertices: ");
+    scanf("%d", &v);
+    int G[MAX][MAX]; 
+    int u, w, z, numEdges;
 
-    printf("Enter the no. of vertices: ");
-    scanf("%d", &V);
-
-    for (int i = 0; i < V; i++)
-    {
-        A[i].vertex = i;
-        A[i].weight = 0;
-        A[i].next = NULL;
+    for (int i = 0; i < v; i++) {
+        for (int j = 0; j < v; j++) { 
+            G[i][j] = 0;
+        }
     }
 
-    do
-    {
-        printf("Enter 1 to add an edge, or 0 to finish: ");
-        scanf("%d", &decision);
-        if (decision == 1)
-        {
-            printf("Enter the vertices for the edge: ");
-            scanf("%d %d", &v1, &v2);
-            printf("Enter the weight: ");
-            scanf("%d", &weight);
-            insert_list(V, v1, v2, A);
-            A[v1].next->weight = weight; 
-            A[v2].next->weight = weight; 
+    for (int i = 0; i < v; i++) {
+        printf("Enter number of edges for vertex %d: ", i);
+        scanf("%d", &numEdges);
+        for (int j = 0; j < numEdges; j++) {
+            printf("Enter edge (source destination) and weight: ");
+            scanf("%d %d %d", &u, &w, &z);
+            G[u][w] = G[w][u] = z ;
         }
-    } while (decision == 1);
-
-    Kruskals(A, V);
+    }
+    krushkals(G, v); 
     return 0;
 }
 
+
+4 2
+0 1 10
+0 2 6
+2
+1 2 4
+1 3 15
+1
+2 3 4
+0
 
 
 
