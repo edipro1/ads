@@ -1,4 +1,4 @@
-//1.Infix to Postfix
+//1.Infix to Postfix WAP to convert a given Infix expression into its equivalent Postfix expression and evaluate it using stack.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -177,6 +177,7 @@ int main()
 }
 
 
+A+B*C+D
 
 
 
@@ -184,9 +185,7 @@ int main()
 
 
 
-
-
-//2.Infix to Prefix
+//2.Infix to Prefix WAP to convert a given Infix expression into its equivalent Prefix expression and evaluate it using stack.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -387,6 +386,136 @@ void main()
     preEval();
 }
 
+A*B+C/D
+
+
+
+
+
+
+
+
+
+
+
+
+//3.Two Stack Operation WAP to implement two stack using array and perform following operations on it. A. PUSH, B. POP, C. StackFull D. StackeEmpty E. Display Stack.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 100
+
+struct TwoStacks {
+    int top1; // Top index of the first stack
+    int top2; // Top index of the second stack
+    int array[MAX_SIZE]; // Array to store elements of both stacks
+};
+
+struct TwoStacks* createTwoStacks() {
+    struct TwoStacks* stacks = (struct TwoStacks*)malloc(sizeof(struct TwoStacks));
+    stacks->top1 = -1; // Initialize top index of the first stack
+    stacks->top2 = MAX_SIZE; // Initialize top index of the second stack
+    return stacks;
+}
+
+int isStack1Full(struct TwoStacks* stacks) {
+    return stacks->top1 == stacks->top2 - 1;
+}
+
+int isStack2Full(struct TwoStacks* stacks) {
+    return stacks->top2 == stacks->top1 + 1;
+}
+
+int isStack1Empty(struct TwoStacks* stacks) {
+    return stacks->top1 == -1;
+}
+
+int isStack2Empty(struct TwoStacks* stacks) {
+    return stacks->top2 == MAX_SIZE;
+}
+
+void push1(struct TwoStacks* stacks, int data) {
+    if (isStack1Full(stacks)) {
+        printf("Stack 1 overflow\n");
+        return;
+    }
+    stacks->array[++stacks->top1] = data;
+}
+
+void push2(struct TwoStacks* stacks, int data) {
+    if (isStack2Full(stacks)) {
+        printf("Stack 2 overflow\n");
+        return;
+    }
+    stacks->array[--stacks->top2] = data;
+}
+
+int pop1(struct TwoStacks* stacks) {
+    if (isStack1Empty(stacks)) {
+        printf("Stack 1 underflow\n");
+        return -1;
+    }
+    return stacks->array[stacks->top1--];
+}
+
+int pop2(struct TwoStacks* stacks) {
+    if (isStack2Empty(stacks)) {
+        printf("Stack 2 underflow\n");
+        return -1;
+    }
+    return stacks->array[stacks->top2++];
+}
+
+void displayStack1(struct TwoStacks* stacks) {
+    if (isStack1Empty(stacks)) {
+        printf("Stack 1 is empty\n");
+        return;
+    }
+    printf("Stack 1: ");
+    for (int i = stacks->top1; i >= 0; i--) {
+        printf("%d ", stacks->array[i]);
+    }
+    printf("\n");
+}
+
+void displayStack2(struct TwoStacks* stacks) {
+    if (isStack2Empty(stacks)) {
+        printf("Stack 2 is empty\n");
+        return;
+    }
+    printf("Stack 2: ");
+    for (int i = stacks->top2; i < MAX_SIZE; i++) {
+        printf("%d ", stacks->array[i]);
+    }
+    printf("\n");
+}
+
+void displayBothStacks(struct TwoStacks* stacks) {
+    displayStack1(stacks);
+    displayStack2(stacks);
+}
+
+int main() {
+    struct TwoStacks* stacks = createTwoStacks();
+
+    push1(stacks, 10);
+    push1(stacks, 20);
+    push1(stacks, 30);
+
+    push2(stacks, 40);
+    push2(stacks, 50);
+    push2(stacks, 60);
+
+    displayBothStacks(stacks);
+
+    pop1(stacks);
+    pop2(stacks);
+
+    displayBothStacks(stacks);
+
+    return 0;
+}
 
 
 
@@ -400,156 +529,10 @@ void main()
 
 
 
-//3.Two Stack Operation
 
-#include <stdio.h>  
-#define SIZE 20  
- int array[SIZE];  // declaration of array type variable.  
-int top1 = -1;  
-int top2 = SIZE;  
-   
-//Function to push data into stack1  
-void push1 (int data)  
-{  
-// checking the overflow condition  
-  if (top1 < top2 - 1)  
-  {  
-      top1++;  
-    array[top1] = data;  
-  }  
-  else  
-  {  
-    printf ("Stack is full");  
-  }  
-}  
-// Function to push data into stack2  
-void push2 (int data)  
-{  
-// checking overflow condition    
-if (top1 < top2 - 1)  
-  {  
-    top2--;  
-    array[top2] = data;   
-  }  
-  else  
-  {  
-    printf ("Stack is full..\n");  
-  }  
-}  
-   
-//Function to pop data from the Stack1  
-void pop1 ()  
-{  
-// Checking the underflow condition   
- if (top1 >= 0)  
-  {  
-    int popped_element = array[top1];  
-    top1--;  
-     
-    printf ("%d is being popped from Stack 1\n", popped_element);  
-  }  
-  else  
-  {  
-    printf ("Stack is Empty \n");  
-  }  
-}  
-// Function to remove the element from the Stack2  
-void pop2 ()  
-{  
-// Checking underflow condition    
-if (top2 < SIZE)  
-  {  
-      int popped_element = array[top2];  
-    top2--;  
-     
-    printf ("%d is being popped from Stack 1\n", popped_element);  
-  }  
-  else  
-  {  
-    printf ("Stack is Empty!\n");  
-  }  
-}  
-   
-//Functions to Print the values of Stack1  
-void display_stack1 ()  
-{  
-  int i;  
-  for (i = top1; i >= 0; --i)  
-  {  
-    printf ("%d ", array[i]);  
-  }  
-  printf ("\n");  
-}  
-// Function to print the values of Stack2  
-void display_stack2 ()  
-{  
-  int i;  
-  for (i = top2; i < SIZE; ++i)  
-  {  
-    printf ("%d ", array[i]);  
-  }  
-  printf ("\n");  
-}  
-   
-int main()  
-{  
-  int ar[SIZE];  
-  int i;  
-  int num_of_ele;  
-   
-  printf ("We can push a total of 20 values\n");  
-   
-  //Number of elements pushed in stack 1 is 10  
-  //Number of elements pushed in stack 2 is 10  
-   
-// loop to insert the elements into Stack1    
-for (i = 1; i <= 10; ++i)  
-  {  
-    push1(i);  
-    printf ("Value Pushed in Stack 1 is %d\n", i);  
-  }  
-// loop to insert the elements into Stack2.    
-for (i = 11; i <= 20; ++i)  
-  {  
-    push2(i);  
-    printf ("Value Pushed in Stack 2 is %d\n", i);  
-  }  
-   
-  //Print Both Stacks  
-  display_stack1 ();  
- display_stack2 ();  
-   
-  //Pushing on Stack Full  
-  printf ("Pushing Value in Stack 1 is %d\n", 11);  
-  push1 (11);  
-   
-  //Popping All Elements from Stack 1  
-  num_of_ele = top1 + 1;  
-  while (num_of_ele)  
-  {  
-    pop1 ();  
-    --num_of_ele;  
-  }  
-   
-  // Trying to Pop the element From the Empty Stack  
-  pop1 ();  
-   
-  return 0;  
-}  
+//4.WAP to implement following by using stack.
+ A. Factorial of a given number B. Generation of Fibonacci series
 
-
-
-
-
-
-
-
-
-
-
-
-
-//4.Factorial&Fibonacchi Stack
 
 
 // // //FactorialUsingStack
@@ -694,7 +677,7 @@ int main() {
 
 
 
-5.Circular Double Ended Queue
+5.Circular Double Ended Queue  Write a Program to implement circular double ended queue where user can add and remove the elements from both front and rear of the queue
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -860,7 +843,181 @@ int main() {
 
 
 
-6.
+6.	//Write a Program to implement multiple two queues using array and perform following operations on it. A. Addq, B. Delq, C. Display Queue.
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 10
+
+typedef struct {
+    int arr[MAX];
+    int front1, rear1;
+    int front2, rear2;
+} TwoQueues;
+
+void initialize(TwoQueues *queues) {
+    queues->front1 = -1;
+    queues->rear1 = -1;
+    queues->front2 = MAX;
+    queues->rear2 = MAX;
+}
+
+int isFull1(TwoQueues *queues) {
+    return (queues->rear1 + 1 == queues->front2);
+}
+
+int isFull2(TwoQueues *queues) {
+    return (queues->rear2 - 1 == queues->rear1);
+}
+
+int isEmpty1(TwoQueues *queues) {
+    return (queues->front1 == -1);
+}
+
+int isEmpty2(TwoQueues *queues) {
+    return (queues->front2 == MAX);
+}
+
+void Addq1(TwoQueues *queues, int item) {
+    if (isFull1(queues)) {
+        printf("Queue 1 Overflow\n");
+        return;
+    }
+
+    if (queues->front1 == -1) {
+        queues->front1 = 0;
+    }
+    queues->rear1++;
+    queues->arr[queues->rear1] = item;
+}
+
+void Addq2(TwoQueues *queues, int item) {
+    if (isFull2(queues)) {
+        printf("Queue 2 Overflow\n");
+        return;
+    }
+
+    if (queues->front2 == MAX) {
+        queues->front2 = MAX - 1;
+    }
+    queues->rear2--;
+    queues->arr[queues->rear2] = item;
+}
+
+void Delq1(TwoQueues *queues) {
+    if (isEmpty1(queues)) {
+        printf("Queue 1 Underflow\n");
+        return;
+    }
+
+    printf("Element deleted from Queue 1 is %d\n", queues->arr[queues->front1]);
+    if (queues->front1 == queues->rear1) {
+        queues->front1 = -1;
+        queues->rear1 = -1;
+    } else {
+        queues->front1++;
+    }
+}
+
+void Delq2(TwoQueues *queues) {
+    if (isEmpty2(queues)) {
+        printf("Queue 2 Underflow\n");
+        return;
+    }
+
+    printf("Element deleted from Queue 2 is %d\n", queues->arr[queues->front2]);
+    if (queues->front2 == queues->rear2) {
+        queues->front2 = MAX;
+        queues->rear2 = MAX;
+    } else {
+        queues->front2--;
+    }
+}
+
+void displayQueue1(TwoQueues *queues) {
+    if (isEmpty1(queues)) {
+        printf("Queue 1 is empty\n");
+        return;
+    }
+
+    printf("Queue 1 elements are:\n");
+    for (int i = queues->front1; i <= queues->rear1; i++) {
+        printf("%d ", queues->arr[i]);
+    }
+    printf("\n");
+}
+
+void displayQueue2(TwoQueues *queues) {
+    if (isEmpty2(queues)) {
+        printf("Queue 2 is empty\n");
+        return;
+    }
+
+    printf("Queue 2 elements are:\n");
+    for (int i = queues->front2; i >= queues->rear2; i--) {
+        printf("%d ", queues->arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    TwoQueues queues;
+    initialize(&queues);
+    int choice, item, queueNumber;
+
+    while (1) {
+        printf("\n1. Addq\n");
+        printf("2. Delq\n");
+        printf("3. Display Queue\n");
+        printf("4. Quit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter queue number (1 or 2): ");
+                scanf("%d", &queueNumber);
+                printf("Input the element to add: ");
+                scanf("%d", &item);
+                if (queueNumber == 1) {
+                    Addq1(&queues, item);
+                } else if (queueNumber == 2) {
+                    Addq2(&queues, item);
+                } else {
+                    printf("Invalid queue number\n");
+                }
+                break;
+            case 2:
+                printf("Enter queue number (1 or 2): ");
+                scanf("%d", &queueNumber);
+                if (queueNumber == 1) {
+                    Delq1(&queues);
+                } else if (queueNumber == 2) {
+                    Delq2(&queues);
+                } else {
+                    printf("Invalid queue number\n");
+                }
+                break;
+            case 3:
+                printf("Enter queue number (1 or 2): ");
+                scanf("%d", &queueNumber);
+                if (queueNumber == 1) {
+                    displayQueue1(&queues);
+                } else if (queueNumber == 2) {
+                    displayQueue2(&queues);
+                } else {
+                    printf("Invalid queue number\n");
+                }
+                break;
+            case 4:
+                exit(0);
+            default:
+                printf("Wrong choice\n");
+        }
+    }
+
+    return 0;
+}
 
 
 
@@ -1015,7 +1172,7 @@ int main() {
 
 
 
-//8. Reverse Linked List:
+//8. Reverse Linked List: Write an iterative Reverse() function that reverses a list by rearranging all the next pointers and the head pointer. Ideally, Reverse() should only need to make one pass of the list.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1109,7 +1266,7 @@ int main() {
 
 
 
-//9. Doubly Linked List
+//9. Doubly Linked List: WAP to create doubly linked list and perform following operations on it. A) Insert (all cases) 2. Delete (all cases).
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1248,6 +1405,18 @@ int main() {
 }
 
 
+1
+10
+2
+20
+1
+5
+2
+25
+3
+10
+4
+5
 
 
 
@@ -1367,13 +1536,113 @@ int main() {
 
 
 
-11.
+//11.  Implement Push and POP operations of STACK on Doubly linked lists
 
 
+#include <stdio.h>
+#include <stdlib.h>
 
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
 
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+    return newNode;
+}
 
+void push(struct Node** topRef, int data) {
+    struct Node* newNode = createNode(data);
+    if (*topRef != NULL) {
+        newNode->next = *topRef;
+        (*topRef)->prev = newNode;
+    }
+    *topRef = newNode;
+    printf("Pushed %d onto the stack\n", data);
+}
 
+int pop(struct Node** topRef) {
+    if (*topRef == NULL) {
+        printf("Stack underflow\n");
+        return -1;
+    }
+    struct Node* temp = *topRef;
+    int poppedData = temp->data;
+    *topRef = temp->next;
+    if (*topRef != NULL) {
+        (*topRef)->prev = NULL;
+    }
+    free(temp);
+    printf("Popped %d from the stack\n", poppedData);
+    return poppedData;
+}
+
+void printStack(struct Node* top) {
+    struct Node* temp = top;
+    printf("Stack: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    struct Node* top = NULL;
+    int choice, data;
+
+    do {
+        printf("\nStack Operations:\n");
+        printf("1. Push\n");
+        printf("2. Pop\n");
+        printf("3. Print Stack\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the data to push onto the stack: ");
+                scanf("%d", &data);
+                push(&top, data);
+                break;
+            case 2:
+                pop(&top);
+                break;
+            case 3:
+                printStack(top);
+                break;
+            case 4:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
+
+1
+10
+1
+20
+1
+30
+3
+2
+3
+2
+3
+2
+3
+2
+4
 
 
 
