@@ -3448,6 +3448,8 @@ int main()
 
 34. Prim’s Algorithm
 
+
+
 //List
 
 #include <stdio.h>
@@ -3550,8 +3552,15 @@ int main() {
     return 0;
 }
 
+4
+5
+0 1 10
+0 2 6
+0 3 5
+1 3 15
+2 3 4
 
-//Matrix:
+
 
 //Matrix
 
@@ -3628,7 +3637,12 @@ int main() {
 }
 
 
-
+5 
+0 2 0 6 0
+2 0 3 8 5
+0 3 0 0 7
+6 8 0 0 9
+0 5 7 9 0
 
 
 35. Kruskals Algorithm using list
@@ -3755,10 +3769,20 @@ int main() {
 }
 
 
+4
+5
+0 1 10
+0 2 6
+0 3 5
+1 3 15
+2 3 4
+
 
 
 
 36. Kruskal’s Algorithm using Matrix
+
+
 
 
 //matrix
@@ -4036,6 +4060,22 @@ int main() {
 }
 
 
+5
+7
+0 1 4
+0 2 8
+1 2 2
+1 3 5
+2 3 5
+2 4 9
+3 4 4
+0
+
+
+
+
+
+
 
 
 38. Dijksta using Matrix
@@ -4126,6 +4166,17 @@ int main() {
 
     return 0;
 }
+
+
+4
+0 1 3 0
+1 0 2 4
+3 2 0 1
+0 4 1 0
+0
+
+
+
 
 
 
@@ -4267,7 +4318,19 @@ int main() {
     return 0;
 }
 
+
+
+
+
+
+
+
+
 //41. Array Position Problem
+Assume that an array A with n elements was sorted in an ascending order, but two of its elements swapped their positions by a mistake while maintaining the array. Write a code to identify the swapped pair of elements and their positions in the asymptotically best possible time. [Assume that all given elements are distinct integers.]
+
+
+
 
 #include <stdio.h>
 
@@ -4315,4 +4378,223 @@ int main() {
     return 0;
 }
 
+5
+3 5 2 4 1
+
+
+
+
+
 //42&43. Hashing
+
+42. Implement following hashing Techniques by assuming suitable input and Table Size.
+a.	Linear Probing With Chaining Without Replacement
+Also mention number of collisions occurred while inserting a Data in hash table.
+
+
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10 // Define the size of the hash table
+#define EMPTY -1      // Define the marker for empty slots
+
+typedef struct {
+    int data;
+    int chain;
+} HashEntry;
+
+HashEntry hashTable[TABLE_SIZE];
+int collisionCount = 0;
+
+// Hash function
+int hashFunction(int key) {
+    return key % TABLE_SIZE;
+}
+
+// Initialize the hash table
+void initializeTable() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hashTable[i].data = EMPTY;
+        hashTable[i].chain = EMPTY;
+    }
+}
+
+// Function to insert data into the hash table
+void insert(int key) {
+    int index = hashFunction(key);
+    
+    if (hashTable[index].data == EMPTY) {
+        hashTable[index].data = key;
+    } else {
+        collisionCount++;
+        int originalIndex = index;
+        while (hashTable[index].data != EMPTY) {
+            index = (index + 1) % TABLE_SIZE;
+            if (index == originalIndex) {
+                printf("Hash table is full!\n");
+                return;
+            }
+        }
+        // Insert the new key
+        hashTable[index].data = key;
+        
+        // Update the chain
+        int chainIndex = hashFunction(key);
+        while (hashTable[chainIndex].chain != EMPTY) {
+            chainIndex = hashTable[chainIndex].chain;
+        }
+        hashTable[chainIndex].chain = index;
+    }
+}
+
+// Function to display the hash table
+void displayTable() {
+    printf("Index\tData\tChain\n");
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        printf("%d\t%d\t%d\n", i, hashTable[i].data, hashTable[i].chain);
+    }
+}
+
+int main() {
+    int data, n;
+    initializeTable();
+
+    printf("Enter the number of elements to insert: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter data %d: ", i + 1);
+        scanf("%d", &data);
+        insert(data);
+    }
+
+    displayTable();
+    printf("Number of collisions: %d\n", collisionCount);
+
+    return 0;
+}
+
+6
+12
+25
+35
+15
+7
+11
+
+
+
+43. 
+Implement following hashing Techniques by assuming suitable input and Table Size.
+a.	Linear Probing With Chaining With Replacement
+Also mention number of collisions occurred while inserting a Data in hash table.
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10 // Define the size of the hash table
+#define EMPTY -1      // Define the marker for empty slots
+
+typedef struct {
+    int data;
+    int chain;
+} HashEntry;
+
+HashEntry hashTable[TABLE_SIZE];
+int collisionCount = 0;
+
+// Hash function
+int hashFunction(int key) {
+    return key % TABLE_SIZE;
+}
+
+// Initialize the hash table
+void initializeTable() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hashTable[i].data = EMPTY;
+        hashTable[i].chain = EMPTY;
+    }
+}
+
+// Function to insert data into the hash table
+void insert(int key) {
+    int index = hashFunction(key);
+    
+    if (hashTable[index].data == EMPTY) {
+        hashTable[index].data = key;
+    } else {
+        collisionCount++;
+        // If the current index contains an element with a different home position, replace it
+        int currentIndex = index;
+        int tempData = hashTable[currentIndex].data;
+        int tempChain = hashTable[currentIndex].chain;
+
+        if (hashFunction(tempData) != currentIndex) {
+            hashTable[currentIndex].data = key;
+            key = tempData;
+
+            // Fix the chain of the displaced element
+            int originalIndex = hashFunction(key);
+            while (hashTable[originalIndex].chain != currentIndex) {
+                originalIndex = hashTable[originalIndex].chain;
+            }
+            hashTable[originalIndex].chain = tempChain;
+        }
+
+        // Linear probing to find the next available slot
+        while (hashTable[index].data != EMPTY) {
+            index = (index + 1) % TABLE_SIZE;
+        }
+        
+        // Insert the new key
+        hashTable[index].data = key;
+
+        // Update the chain for the original slot
+        int chainIndex = hashFunction(key);
+        while (hashTable[chainIndex].chain != EMPTY) {
+            chainIndex = hashTable[chainIndex].chain;
+        }
+        hashTable[chainIndex].chain = index;
+    }
+}
+
+// Function to display the hash table
+void displayTable() {
+    printf("Index\tData\tChain\n");
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        printf("%d\t%d\t%d\n", i, hashTable[i].data, hashTable[i].chain);
+    }
+}
+
+int main() {
+    int data, n;
+    initializeTable();
+
+    printf("Enter the number of elements to insert: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter data %d: ", i + 1);
+        scanf("%d", &data);
+        insert(data);
+    }
+
+    displayTable();
+    printf("Number of collisions: %d\n", collisionCount);
+
+    return 0;
+}
+
+
+6
+12
+25
+35
+15
+7
+11
+
