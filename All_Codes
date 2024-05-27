@@ -190,201 +190,150 @@ A+B*C+D
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//reverse, convert to postfix, reverse again
-#define MAX 100
+#include <ctype.h>
 
-char infix[MAX], stack[MAX], postfix[MAX], prefix[MAX];
-int top = -1;
-char rev[MAX];
+#define MAX_SIZE 100
 
-void push(char c)
-{
-    if (top == MAX-1)
-    {
-        printf("Stack Overflow");
-        return;
-    }
-    top++;
-    stack[top] = c;
+struct Stack {
+    int top;
+    int capacity;
+    char* array;
+};
+
+struct Stack* createStack(int capacity) {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->capacity = capacity;
+    stack->top = -1;
+    stack->array = (char*)malloc(stack->capacity * sizeof(char));
+    return stack;
 }
 
-char pop()
-{
-    if (top == -1)
-    {
-        printf("stack underflow");
-        exit(1);
-    }
-
-    char c = stack[top];
-    top--;
-    return c;
-
+int isEmpty(struct Stack* stack) {
+    return stack->top == -1;
 }
 
-int isEmpty()
-{
-    if (top == -1)
-    {
-        return 1;
+int isFull(struct Stack* stack) {
+    return stack->top == stack->capacity - 1;
+}
+
+void push(struct Stack* stack, char item) {
+    if (isFull(stack)) return;
+    stack->array[++stack->top] = item;
+}
+
+char pop(struct Stack* stack) {
+    if (isEmpty(stack)) return -1;
+    return stack->array[stack->top--];
+}
+
+char peek(struct Stack* stack) {
+    if (isEmpty(stack)) return -1;
+    return stack->array[stack->top];
+}
+
+int precedence(char op) {
+    switch(op) {
+        case '+':
+        case '-':
+            return 1;
+        case '*':
+        case '/':
+            return 2;
+        case '^':
+            return 3;
+        default:
+            return -1;
     }
+}
+
+void infixToPrefix(char* infix, char* prefix) {
+    int len = strlen(infix);
+    // Reverse the infix expression
+    for (int i = 0; i < len / 2; ++i) {
+        char temp = infix[i];
+        infix[i] = infix[len - i - 1];
+        infix[len - i - 1] = temp;
+    }
+    // Swap '(' and ')' and reverse the precedence of operators
+    for (int i = 0; i < len; ++i) {
+        if (infix[i] == '(')
+            infix[i] = ')';
+        else if (infix[i] == ')')
+            infix[i] = '(';
+    }
+    struct Stack* stack = createStack(MAX_SIZE);
+    int i, k;
+    for (i = 0, k = -1; infix[i]; ++i) {
+        if (isalnum(infix[i])) {
+            prefix[++k] = infix[i];
+        } else if (infix[i] == '(') {
+            push(stack, infix[i]);
+        } else if (infix[i] == ')') {
+            while (!isEmpty(stack) && peek(stack) != '(') {
+                prefix[++k] = pop(stack);
+            }
+            pop(stack);
+        } else {
+            while (!isEmpty(stack) && precedence(infix[i]) < precedence(peek(stack))) {
+                prefix[++k] = pop(stack);
+            }
+            push(stack, infix[i]);
+        }
+    }
+    while (!isEmpty(stack)) {
+        prefix[++k] = pop(stack);
+    }
+    prefix[++k] = '\0';
+    // Reverse the prefix expression to get the final result
+    len = strlen(prefix);
+    for (int i = 0; i < len / 2; ++i) {
+        char temp = prefix[i];
+        prefix[i] = prefix[len - i - 1];
+        prefix[len - i - 1] = temp;
+    }
+}
+
+int evaluatePrefix(char* prefix) {
+    struct Stack* stack = createStack(MAX_SIZE);
+    int i, operand1, operand2;
+    for (i = 0; prefix[i]; ++i) {
+        if (isdigit(prefix[i])) {
+            push(stack, prefix[i] - '0');
+        } else {
+            operand1 = pop(stack);
+            operand2 = pop(stack);
+            switch(prefix[i]) {
+                case '+':
+                    push(stack, operand1 + operand2);
+                    break;
+                case '-':
+                    push(stack, operand1 - operand2);
+                    break;
+                case '*':
+                    push(stack, operand1 * operand2);
+                    break;
+                case '/':
+                    push(stack, operand1 / operand2);
+                    break;
+                case '^':
+                    push(stack, operand1 ^ operand2);
+                    break;
+            }
+        }
+    }
+    return pop(stack);
+}
+
+int main() {
+    char infix[MAX_SIZE], prefix[MAX_SIZE];
+    printf("Enter an infix expression: ");
+    scanf("%s", infix);
+    infixToPrefix(infix, prefix);
+    printf("Prefix expression: %s\n", prefix);
+    printf("Result: %d\n", evaluatePrefix(prefix));
     return 0;
 }
 
-int precedence(char symbol)
-{
-    switch(symbol)
-    {
-    case '^':
-        return 3;
-    case '/':
-    case '*':
-        return 2;
-    case '+':
-    case '-':
-        return 1;
-    default:
-        return 0;
-    }
-}
-
-void reverseStr(char a[MAX], char b[MAX])
-{
-    int n = strlen(a);
-    int i = 0, j = 0;
-
-    while (a[i] != '\0')
-    {
-        b[n-1-j] = a[i];
-        i++;
-        j++;
-    }
-
-    b[n] = '\0';
-
-    for (int i = 0; i < strlen(b); i++)
-    {
-        if(b[i] == '(')
-        {
-            b[i] = ')';
-        }
-        else if (b[i] == ')')
-        {
-            b[i] = '(';
-        }
-    }
-}
-
-void pref()
-{
-    int i, j = 0;
-    char symbol, next;
-
-    for (i = 0; i < strlen(rev); i++)
-    {
-        symbol = rev[i];
-
-        switch(symbol)
-        {
-        case '(':
-            push(symbol);
-            break;
-        case ')':
-            while((next = pop()) != '(')
-            {
-                postfix[j++] = next;
-            }
-            break;
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-        case '^':
-            while (!isEmpty() && precedence(stack[top]) >= precedence(symbol))
-            {
-                postfix[j++] = pop();
-            }
-            push(symbol);
-            break;
-        default:
-            postfix[j++] = symbol;
-            break;
-        }
-    }
-    while(!isEmpty())
-    {
-        postfix[j++] = pop();
-    }
-    postfix[j] = '\0';
-}
-
-void preEval()
-{
-    int i = 0, o1, o2;
-    char symbol;
-
-    for (i = strlen(prefix)-1; i >= 0; i--)
-    {
-        symbol = prefix[i];
-
-        switch(symbol)
-        {
-        case '+':
-            o1 = pop() - '0';
-            o2 = pop() - '0';
-            push((o1 + o2)+'0');
-            break;
-        case '-':
-            o1 = pop() - '0';
-            o2 = pop() - '0';
-            push((o1 - o2)+'0');
-            break;
-        case '*':
-            o1 = pop() - '0';
-            o2 = pop() - '0';
-            push((o1 * o2)+'0');
-            break;
-        case '/':
-            o1 = pop() - '0';
-            o2 = pop() - '0';
-            push((o1 / o2)+'0');
-            break;
-        case '^':
-            o1 = pop() - '0';
-            o2 = pop() - '0';
-            push((o1 ^ o2)+'0');
-            break;
-        default:
-            push(symbol);
-            break;
-        }
-    }
-
-    printf("\nThe result is: %c", stack[top]);
-}
-
-
-void main()
-{
-    printf("Enter Infix Expression: ");
-    gets(infix);
-
-    reverseStr(infix, rev);
-
-    pref();
-
-    reverseStr(postfix, prefix);
-
-    printf("\n");
-
-    printf("Equivalent Prefix Expression is: ");
-    for (int i = 0; i < strlen(prefix); i++)
-    {
-        printf("%c", prefix[i]);
-    }
-
-    preEval();
-}
 
 A*B+C/D
 
@@ -844,6 +793,7 @@ int main() {
 
 
 6.	//Write a Program to implement multiple two queues using array and perform following operations on it. A. Addq, B. Delq, C. Display Queue.
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1174,6 +1124,7 @@ int main() {
 
 //8. Reverse Linked List: Write an iterative Reverse() function that reverses a list by rearranging all the next pointers and the head pointer. Ideally, Reverse() should only need to make one pass of the list.
 
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1267,6 +1218,7 @@ int main() {
 
 
 //9. Doubly Linked List: WAP to create doubly linked list and perform following operations on it. A) Insert (all cases) 2. Delete (all cases).
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1405,20 +1357,6 @@ int main() {
 }
 
 
-1
-10
-2
-20
-1
-5
-2
-25
-3
-10
-4
-5
-
-
 
 
 
@@ -1427,6 +1365,7 @@ int main() {
 
 
 //10. Merge Doubly Linked Lists
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1536,7 +1475,9 @@ int main() {
 
 
 
+
 //11.  Implement Push and POP operations of STACK on Doubly linked lists
+
 
 
 #include <stdio.h>
@@ -1628,22 +1569,6 @@ int main() {
     return 0;
 }
 
-1
-10
-1
-20
-1
-30
-3
-2
-3
-2
-3
-2
-3
-2
-4
-
 
 
 
@@ -1656,6 +1581,8 @@ int main() {
 
 
 //12. Add/Delete Of Queue on DLL: Implement ADD and DELETE operations of QUEUE on Doubly linked lists
+
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1783,6 +1710,9 @@ int main() {
 
     return 0;
 }
+
+
+
 
 
 
@@ -2113,6 +2043,14 @@ int main() {
 
     return 0;
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -2491,6 +2429,15 @@ int main() {
 8
 10
 12
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3002,7 +2949,11 @@ int main() {
 
 
 
+
+
 //30 & 32. BFS and DFS using Adjacency Matrix
+
+
 
 
 
@@ -3562,6 +3513,8 @@ int main() {
 
 
 
+
+
 //Matrix
 
 #include <stdio.h>
@@ -3643,6 +3596,10 @@ int main() {
 0 3 0 0 7
 6 8 0 0 9
 0 5 7 9 0
+
+
+
+
 
 
 35. Kruskals Algorithm using list
@@ -3780,6 +3737,8 @@ int main() {
 
 
 
+
+
 36. Kruskal’s Algorithm using Matrix
 
 
@@ -3879,6 +3838,7 @@ int main() {
 
 
 37. Dijksta using list
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -4143,6 +4103,7 @@ int main() {
 
 //39 & 40. Student QuickSort & HeapSort
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -4345,13 +4306,13 @@ int main() {
 
 
 
+
 //42&43. Hashing
+
 
 42. Implement following hashing Techniques by assuming suitable input and Table Size.
 a.	Linear Probing With Chaining Without Replacement
 Also mention number of collisions occurred while inserting a Data in hash table.
-
-
 
 
 
@@ -4444,6 +4405,11 @@ int main() {
 15
 7
 11
+
+
+
+
+
 
 
 
